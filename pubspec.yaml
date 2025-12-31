@@ -1,0 +1,30 @@
+name: mb_rich_editor
+description: A highly customizable WebView-based rich text editor for Flutter with pre-built toolbar.
+version: 0.0.1
+homepage: https://github.com/iamqh/mb_rich_editor
+
+environment:
+  sdk: ^3.10.1
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # WebView integration for rich text editing
+  webview_flutter: ^4.10.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # Assets for rich editor
+  assets:
+    - assets/rich_editor/

@@ -1,0 +1,100 @@
+/**
+ * Copyright (C) 2020 Wasabeef
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+@charset "UTF-8";
+
+:root {
+  --thread-background-color: #E9EAEC;
+  --text-color: black;
+  --blockquote-text-color: #FA944D;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --thread-background-color: #0f0f0f;
+    --text-color: #C9CCCF;
+    --blockquote-text-color: #D48311;
+  }
+}
+
+
+html {
+  height: 100%;
+}
+
+body {
+  background: var(--thread-background-color);
+  overflow: scroll;
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+  min-height: 100%;
+}
+
+#editor {
+  display: table-cell;
+  outline: 0px solid transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  color: var(--text-color);
+}
+
+#editor[placeholder]:empty:not(:focus):before {
+  content: attr(placeholder);
+  opacity: .5;
+}
+
+
+blockquote {
+  border: 1px solid var(--blockquote-border);
+  border-left: 2px solid var(--blockquote-text-color);
+  border-radius: 1px;
+  margin: 5px;
+}
+
+blockquote::before {
+  content: attr(data-quote);
+  font-weight: bold;
+  display: block;
+  color: var(--blockquote-text-color);
+  padding-left: 10px;
+}
+
+p {
+  padding: 0px;
+  margin: 0px;
+}
+
+
+blockquote {
+  padding-left: 5px;
+}
+
+
+img.smilie {
+  display: inline;
+  max-width: 48px;
+  width: auto;
+  height: auto;
+  padding: 0px;
+}
+
+img  {
+  display: inline;
+  max-width: 80%;
+  max-height: 80%;
+  padding: 5px;
+}

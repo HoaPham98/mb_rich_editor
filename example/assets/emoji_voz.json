@@ -1,0 +1,487 @@
+{
+  "emoji_source": {
+    "isDefault": true,
+    "sourceURL": "assets/emoji/",
+    "sourceName": "Voz",
+    "imageHeader": "https://data.voz.vn/styles/next/xenforo/smilies/popo/smile_2x.png?v=01",
+    "emojiClassName": "smilie fr-fic fr-dii fr-draggable",
+    "isUnicode": false,
+    "version": 8
+  },
+  "emojis": [
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/adore_x2.png?v=01",
+      "emoji_alt": ":adore:",
+      "emoji_name": "Adore",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/after_boom_x2.png?v=01",
+      "emoji_alt": ":after_boom:",
+      "emoji_name": "After boom",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/ah_x2.png?v=01",
+      "emoji_alt": ":ah:",
+      "emoji_name": "Ah",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/amazed_x2.png?v=01",
+      "emoji_alt": ":amazed:",
+      "emoji_name": "Amazed",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/angry_x2.png?v=01",
+      "emoji_alt": ":angry:",
+      "emoji_name": "Angry",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/bad_smelly_x2.png?v=01",
+      "emoji_alt": ":bad_smelly:",
+      "emoji_name": "Bad smelly",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/baffle_x2.png?v=01",
+      "emoji_alt": ":baffle:",
+      "emoji_name": "Baffle",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/beat_brick_x2.png?v=01",
+      "emoji_alt": ":beat_brick:",
+      "emoji_name": "Beat brick",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/beat_plaster_x2.png?v=01",
+      "emoji_alt": ":beat_plaster:",
+      "emoji_name": "Beat_plaster",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/beat_shot_x2.png?v=01",
+      "emoji_alt": ":beat_shot:",
+      "emoji_name": "Beat shot",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/beated_x2.png?v=01",
+      "emoji_alt": ":beated:",
+      "emoji_name": "Beated",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/beauty_x2.png?v=01",
+      "emoji_alt": ":beauty:",
+      "emoji_name": "Beauty",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/big_smile_x2.png?v=01",
+      "emoji_alt": ":big_smile:",
+      "emoji_name": "Big smile",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/boss_x2.png?v=01",
+      "emoji_alt": ":boss:",
+      "emoji_name": "Boss",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/burn_joss_stick_x2.png?v=01",
+      "emoji_alt": ":burn_joss_stick:",
+      "emoji_name": "Burn_joss_stick",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/byebye_x2.png?v=01",
+      "emoji_alt": ":byebye:",
+      "emoji_name": "Byebye",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/canny_x2.png?v=01",
+      "emoji_alt": ":canny:",
+      "emoji_name": "Canny",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/choler_x2.png?v=01",
+      "emoji_alt": ":choler:",
+      "emoji_name": "Choler",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/cold_x2.png?v=01",
+      "emoji_alt": ":cold:",
+      "emoji_name": "Cold",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/confident_x2.png?v=01",
+      "emoji_alt": ":confident:",
+      "emoji_name": "Confident",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/confuse_x2.png?v=01",
+      "emoji_alt": ":confuse:",
+      "emoji_name": "Confuse",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/cool_x2.png?v=01",
+      "emoji_alt": ":cool:",
+      "emoji_name": "Cool",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/cry_x2.png?v=01",
+      "emoji_alt": ":cry:",
+      "emoji_name": "cry",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/doubt_x2.png?v=01",
+      "emoji_alt": ":doubt:",
+      "emoji_name": "doubt",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/dribble_x2.png?v=01",
+      "emoji_alt": ":dribble:",
+      "emoji_name": "dribble",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/embarrassed_x2.png?v=01",
+      "emoji_alt": ":embarrassed:",
+      "emoji_name": "embarrassed",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/extreme_sexy_girl_x2.png?v=01",
+      "emoji_alt": ":extreme_sexy_girl:",
+      "emoji_name": "extreme sexy girl",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/feel_good_x2.png?v=01",
+      "emoji_alt": ":feel_gode:",
+      "emoji_name": "feed good",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/go_x2.png?v=01",
+      "emoji_alt": ":go:",
+      "emoji_name": "go",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/haha_x2.png?v=01",
+      "emoji_alt": ":haha:",
+      "emoji_name": "haha",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/hell_boy_x2.png?v=01",
+      "emoji_alt": ":hell_boy:",
+      "emoji_name": "hell_boy",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/hungry_x2.png?v=01",
+      "emoji_alt": ":hungry:",
+      "emoji_name": "Hungry",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/look_down_x2.png?v=01",
+      "emoji_alt": ":look_down:",
+      "emoji_name": "Look down",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/matrix_x2.png?v=01",
+      "emoji_alt": ":matrix:",
+      "emoji_name": "matrix",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/misdoubt_x2.png?v=01",
+      "emoji_alt": ":misdoubt:",
+      "emoji_name": "Misdoubt",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/nosebleed_x2.png?v=01",
+      "emoji_alt": ":nosebleed:",
+      "emoji_name": "Nosebleed",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/oh_x2.png?v=01",
+      "emoji_alt": ":oh:",
+      "emoji_name": "Oh",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/ops_x2.png?v=01",
+      "emoji_alt": ":ops:",
+      "emoji_name": "ops",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/pudency_x2.png?v=01",
+      "emoji_alt": ":pudency:",
+      "emoji_name": "Pudency",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/rap_x2.png?v=01",
+      "emoji_alt": ":rap:",
+      "emoji_name": "Rap",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/sad_x2.png?v=01",
+      "emoji_alt": ":sad:",
+      "emoji_name": "Sad",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/sexy_girl_x2.png?v=01",
+      "emoji_alt": ":sexy_girl:",
+      "emoji_name": "sexy_girl",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/shame_x2.png?v=01",
+      "emoji_alt": ":shame:",
+      "emoji_name": "shame",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/smile_x2.png?v=01",
+      "emoji_alt": ":smile:",
+      "emoji_name": "smile",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/spiderman_x2.png?v=01",
+      "emoji_alt": ":spiderman:",
+      "emoji_name": "Spiderman",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/still_dreaming_x2.png?v=01",
+      "emoji_alt": ":still_dreaming:",
+      "emoji_name": "still_dreaming",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/sure_x2.png?v=01",
+      "emoji_alt": ":sure:",
+      "emoji_name": "sure",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/surrender_x2.png?v=01",
+      "emoji_alt": ":surrender:",
+      "emoji_name": "Surrender",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/sweat_x2.png?v=01",
+      "emoji_alt": ":sweat:",
+      "emoji_name": "sweat",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/sweet_kiss_x2.png?v=01",
+      "emoji_alt": ":sweet_kiss:",
+      "emoji_name": "Sweet Kiss",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/tire_x2.png?v=01",
+      "emoji_alt": ":tire:",
+      "emoji_name": "tire",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/too_sad_x2.png?v=01",
+      "emoji_alt": ":too_sad:",
+      "emoji_name": "too_sad",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/waaaht_x2.png?v=01",
+      "emoji_alt": ":waaht:",
+      "emoji_name": "Waaaht",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popopo/what_x2.png?v=01",
+      "emoji_alt": ":what:",
+      "emoji_name": "What",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/smile.png?v=01",
+      "emoji_alt": ":)",
+      "emoji_name": "Smile",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/wink.png?v=01",
+      "emoji_alt": ";)",
+      "emoji_name": "Wink",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/frown.png?v=02",
+      "emoji_alt": ":(",
+      "emoji_name": "Frown",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/mad.png?v=01",
+      "emoji_alt": ":mad:",
+      "emoji_name": "Mad",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/confused.png?v=01",
+      "emoji_alt": ":confused:",
+      "emoji_name": "Confused",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/cool.png?v=01",
+      "emoji_alt": ":cool:",
+      "emoji_name": "Cool",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/tongue.png?v=01",
+      "emoji_alt": ":p",
+      "emoji_name": "Stick out tongue",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/biggrin.png?v=01",
+      "emoji_alt": ":D",
+      "emoji_name": "Big grin",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/eek.png?v=01",
+      "emoji_alt": ":eek:",
+      "emoji_name": "Eek!",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/redface.png?v=01",
+      "emoji_alt": ":oops:",
+      "emoji_name": "Oops!",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/rolleyes.png?v=01",
+      "emoji_alt": ":rolleyes:",
+      "emoji_name": "Roll eyes",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/O_o.png?v=01",
+      "emoji_alt": "o_O",
+      "emoji_name": "Er... what?",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/cautious.png?v=01",
+      "emoji_alt": ":cautious:",
+      "emoji_name": "Cautious",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/speechless.png?v=01",
+      "emoji_alt": ":censored:",
+      "emoji_name": "Censored",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/cry.png?v=01",
+      "emoji_alt": ":=((",
+      "emoji_name": "Crying",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/inlove.png?v=01",
+      "emoji_alt": ":love:",
+      "emoji_name": "Love",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/laugh.png?v=01",
+      "emoji_alt": ":LOL:",
+      "emoji_name": "Laugh",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/roflmao.png?v=01",
+      "emoji_alt": ":ROFLMAO:",
+      "emoji_name": "ROFL",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/sick.png?v=01",
+      "emoji_alt": ":sick:",
+      "emoji_name": "SICK",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/sleep.png?v=01",
+      "emoji_alt": ":sleep:",
+      "emoji_name": "Sleep",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/sneaky.png?v=01",
+      "emoji_alt": ":sneaky:",
+      "emoji_name": "Sneaky",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/unsure.png?v=01",
+      "emoji_alt": ":unsure:",
+      "emoji_name": "Unsure",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/whistling.png?v=01",
+      "emoji_alt": ":whistle:",
+      "emoji_name": "Whistling",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/giggle.png?v=01",
+      "emoji_alt": ":giggle:",
+      "emoji_name": "Giggle",
+      "unicode": null
+    },
+    {
+      "emoji_url": "https://data.voz.vn/styles/next/xenforo/smilies/popo/devilish.png?v=01",
+      "emoji_alt": ":devil:",
+      "emoji_name": "Devil",
+      "unicode": null
+    }
+  ]
+}
