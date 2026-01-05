@@ -59,14 +59,14 @@ document.addEventListener("selectionchange", function () { RE.backuprange(); });
 
 // Initializations
 RE.editor.addEventListener("focus", function () {
-    if (window.onFocus && window.onFocus.postMessage) {
-        window.onFocus.postMessage('focused');
+    if (window.flutter_inappwebview) {
+        window.flutter_inappwebview.callHandler('onFocus', 'focused');
     }
 });
 
 RE.editor.addEventListener("blur", function () {
-    if (window.onBlur && window.onBlur.postMessage) {
-        window.onBlur.postMessage('blurred');
+    if (window.flutter_inappwebview) {
+        window.flutter_inappwebview.callHandler('onBlur', 'blurred');
     }
 });
 
@@ -83,9 +83,9 @@ RE.callback = function () {
         callbackTimeout = setTimeout(function () {
             lastCallbackHtml = currentHtml;
             wrapText();
-            // Use JavaScriptChannel if available, fallback to URL scheme
-            if (window.onTextChange && window.onTextChange.postMessage) {
-                window.onTextChange.postMessage(currentHtml);
+            // Use flutter_inappwebview callHandler if available, fallback to URL scheme
+            if (window.flutter_inappwebview) {
+                window.flutter_inappwebview.callHandler('onTextChange', currentHtml);
             } else {
                 window.location.href = "re-callback://" + encodeURIComponent(currentHtml);
             }
@@ -466,9 +466,9 @@ RE.enabledEditingItems = function (e) {
 
         stateCallbackTimeout = setTimeout(function () {
             lastStateString = stateString;
-            // Use JavaScriptChannel if available, fallback to URL scheme
-            if (window.onDecorationState && window.onDecorationState.postMessage) {
-                window.onDecorationState.postMessage(stateString);
+            // Use flutter_inappwebview callHandler if available, fallback to URL scheme
+            if (window.flutter_inappwebview) {
+                window.flutter_inappwebview.callHandler('onDecorationState', stateString);
             } else {
                 window.location.href = "re-state://" + encodeURI(stateString);
             }
@@ -526,8 +526,8 @@ RE.editor.addEventListener("input", function (e) {
     // Check if user typed space - hide mention bottom sheet
     if (e.data === ' ' || e.inputType === 'insertText' && e.data === ' ') {
         console.log('DEBUG: Space typed, hiding mention bottom sheet');
-        if (window.hideMentionBottomSheet && window.hideMentionBottomSheet.postMessage) {
-            window.hideMentionBottomSheet.postMessage('');
+        if (window.flutter_inappwebview) {
+            window.flutter_inappwebview.callHandler('hideMentionBottomSheet');
         }
         return;
     }
@@ -538,8 +538,8 @@ RE.editor.addEventListener("input", function (e) {
         console.log('DEBUG: Text around cursor:', textAroundCursor);
         if (endSpace.test(textAroundCursor)) {
             console.log('DEBUG: ends with space, hiding mention bottom sheet');
-            if (window.hideMentionBottomSheet && window.hideMentionBottomSheet.postMessage) {
-                window.hideMentionBottomSheet.postMessage('');
+            if (window.flutter_inappwebview) {
+                window.flutter_inappwebview.callHandler('hideMentionBottomSheet');
             }
             return;
         }
@@ -550,9 +550,9 @@ RE.editor.addEventListener("input", function (e) {
         if (triggerEvent && triggerEvent.query.length >= 1) {
             console.log('DEBUG: Triggering mention with query:', triggerEvent.query);
             // Send mention trigger to Flutter
-            if (window.getMentionTextAtCursor && window.getMentionTextAtCursor.postMessage) {
+            if (window.flutter_inappwebview) {
                 const mentionText = textAroundCursor.substring(triggerEvent.position);
-                window.getMentionTextAtCursor.postMessage(mentionText);
+                window.flutter_inappwebview.callHandler('getMentionTextAtCursor', mentionText);
             }
         }
     }

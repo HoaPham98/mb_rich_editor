@@ -44,12 +44,12 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
           _uiState.updateKeyboardHeight(height);
           _uiState.showKeyboard();
         } else {
-          // If keyboard hides, check if we need to switch to None or if we are switching to Emoji
-          // Usually if user dismissed keyboard, we go to None.
-          // If we are showing Emoji, we already set state to Emoji, so we might not want to reset if it's just the keyboard hiding animation
-          if (_uiState.isKeyboardVisible) {
+          // Check if this was a manual dismiss before closing
+          if (_uiState.isKeyboardVisible && !_uiState.isManualDismiss) {
+            // Only close if user dismissed keyboard (not code)
             _uiState.closeBottomAttachment();
           }
+          // If manual dismiss, do nothing - emoji stays visible
         }
       },
     );
@@ -132,12 +132,15 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
 
   void _onEmojiButtonTapped() {
     if (_uiState.isKeyboardVisible) {
+      // Mark as manual dismiss BEFORE calling blur()
+      _uiState.markManualDismiss();
       _controller.blur();
       _uiState.showEmojiPicker();
     } else {
       if (_uiState.isEmojiVisible) {
+        // Don't call showKeyboard() here - let keyboard listener handle it
+        // to avoid double rebuild and flicker
         _controller.focus();
-        _uiState.showKeyboard();
         // Keyboard showing will trigger listener to update state to keyboard
       } else {
         _uiState.showEmojiPicker();

@@ -1,5 +1,3 @@
-library mb_rich_editor;
-
 export 'src/core/rich_editor.dart';
 export 'src/core/rich_editor_controller.dart';
 

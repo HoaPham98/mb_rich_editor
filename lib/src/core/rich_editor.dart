@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'rich_editor_controller.dart';
 import '../mention/models/mention.dart';
@@ -83,13 +83,12 @@ class RichEditor extends StatefulWidget {
 }
 
 class _RichEditorState extends State<RichEditor> {
-  late WebViewController _webViewController;
+  late InAppWebViewController _webViewController;
 
   @override
   void initState() {
     super.initState();
     _setupController();
-    _initWebViewController();
   }
 
   void _setupController() {
@@ -109,124 +108,120 @@ class _RichEditorState extends State<RichEditor> {
     };
   }
 
-  void _initWebViewController() {
-    _webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(widget.backgroundColor ?? Colors.transparent)
-      ..addJavaScriptChannel(
-        'onTextChange',
-        onMessageReceived: (JavaScriptMessage message) {
-          widget.controller.updateHtml(message.message);
-        },
-      )
-      ..addJavaScriptChannel(
-        'onDecorationState',
-        onMessageReceived: (JavaScriptMessage message) {
-          widget.controller.updateDecorationState(message.message);
-        },
-      )
-      ..addJavaScriptChannel(
-        'getHtmlResult',
-        onMessageReceived: (JavaScriptMessage message) {
-          widget.controller.setHtmlResult(message.message);
-        },
-      )
-      ..addJavaScriptChannel(
-        'getMentionAtCursor',
-        onMessageReceived: (JavaScriptMessage message) {
-          debugPrint('DEBUG: getMentionAtCursor received: ${message.message}');
-          // Parse and set mention
-          if (message.message.isNotEmpty) {
-            try {
-              final mentionData = jsonDecode(message.message);
-              final mention = Mention.fromJson(mentionData);
-              widget.controller.setCurrentMention(mention);
-            } catch (e) {
-              debugPrint('DEBUG: Error parsing mention: $e');
-            }
+  void _registerJavaScriptHandlers(InAppWebViewController controller) {
+    controller.addJavaScriptHandler(
+      handlerName: 'onTextChange',
+      callback: (args) {
+        if (args.isNotEmpty) {
+          widget.controller.updateHtml(args[0].toString());
+        }
+      },
+    );
+
+    controller.addJavaScriptHandler(
+      handlerName: 'onDecorationState',
+      callback: (args) {
+        if (args.isNotEmpty) {
+          widget.controller.updateDecorationState(args[0].toString());
+        }
+      },
+    );
+
+    controller.addJavaScriptHandler(
+      handlerName: 'getHtmlResult',
+      callback: (args) {
+        if (args.isNotEmpty) {
+          widget.controller.setHtmlResult(args[0].toString());
+        }
+      },
+    );
+
+    controller.addJavaScriptHandler(
+      handlerName: 'getMentionAtCursor',
+      callback: (args) {
+        if (args.isNotEmpty) {
+          debugPrint('DEBUG: getMentionAtCursor received: ${args[0]}');
+          try {
+            final mentionData = jsonDecode(args[0].toString());
+            final mention = Mention.fromJson(mentionData);
+            widget.controller.setCurrentMention(mention);
+          } catch (e) {
+            debugPrint('DEBUG: Error parsing mention: $e');
           }
-        },
-      )
-      ..addJavaScriptChannel(
-        'getMentionTextAtCursor',
-        onMessageReceived: (JavaScriptMessage message) {
-          debugPrint(
-            'DEBUG: getMentionTextAtCursor received: ${message.message}',
-          );
-          widget.controller.setMentionTextAtCursor(message.message);
-        },
-      )
-      ..addJavaScriptChannel(
-        'hideMentionBottomSheet',
-        onMessageReceived: (JavaScriptMessage message) {
-          debugPrint('DEBUG: hideMentionBottomSheet called');
-          widget.controller.hideMentionBottomSheet();
-        },
-      )
-      ..addJavaScriptChannel(
-        'getAllMentions',
-        onMessageReceived: (JavaScriptMessage message) {
-          debugPrint('DEBUG: getAllMentions received: ${message.message}');
-          if (message.message.isNotEmpty) {
-            try {
-              final List<dynamic> mentionsData = jsonDecode(message.message);
-              final mentions = mentionsData
-                  .map((data) => Mention.fromJson(data))
-                  .toList();
-              widget.controller.setAllMentions(mentions);
-            } catch (e) {
-              debugPrint('DEBUG: Error parsing mentions: $e');
-            }
+        }
+      },
+    );
+
+    controller.addJavaScriptHandler(
+      handlerName: 'getMentionTextAtCursor',
+      callback: (args) {
+        if (args.isNotEmpty) {
+          debugPrint('DEBUG: getMentionTextAtCursor received: ${args[0]}');
+          widget.controller.setMentionTextAtCursor(args[0].toString());
+        }
+      },
+    );
+
+    controller.addJavaScriptHandler(
+      handlerName: 'hideMentionBottomSheet',
+      callback: (args) {
+        debugPrint('DEBUG: hideMentionBottomSheet called');
+        widget.controller.hideMentionBottomSheet();
+      },
+    );
+
+    controller.addJavaScriptHandler(
+      handlerName: 'getAllMentions',
+      callback: (args) {
+        if (args.isNotEmpty) {
+          debugPrint('DEBUG: getAllMentions received: ${args[0]}');
+          try {
+            final List<dynamic> mentionsData = jsonDecode(args[0].toString());
+            final mentions = mentionsData
+                .map((data) => Mention.fromJson(data))
+                .toList();
+            widget.controller.setAllMentions(mentions);
+          } catch (e) {
+            debugPrint('DEBUG: Error parsing mentions: $e');
           }
-        },
-      )
-      ..addJavaScriptChannel(
-        'onFocus',
-        onMessageReceived: (JavaScriptMessage message) {
-          // Notify external listeners if needed, but do not steal focus
-          // to the ghost text field as this breaks WebView input
-          debugPrint('DEBUG: WebView focused');
-        },
-      )
-      ..addJavaScriptChannel(
-        'onBlur',
-        onMessageReceived: (JavaScriptMessage message) {
-          debugPrint('DEBUG: WebView blurred');
-        },
-      )
-      ..loadFlutterAsset(
-        'packages/mb_rich_editor/assets/rich_editor/index.html',
-      )
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageFinished: (String url) {
-            _applyInitialSettings();
-            widget.controller.setReady(true);
-          },
-          onNavigationRequest: (NavigationRequest navigation) {
-            final uri = Uri.parse(navigation.url);
+        }
+      },
+    );
 
-            // Handle text change callback via URL scheme
-            if (uri.scheme == 're-callback') {
-              final html = Uri.decodeComponent(uri.path);
-              widget.controller.updateHtml(html);
-              return NavigationDecision.prevent;
-            }
+    controller.addJavaScriptHandler(
+      handlerName: 'onFocus',
+      callback: (args) {
+        debugPrint('DEBUG: WebView focused');
+      },
+    );
 
-            // Handle decoration state callback via URL scheme
-            if (uri.scheme == 're-state') {
-              final state = Uri.decodeComponent(uri.path);
-              widget.controller.updateDecorationState(state);
-              return NavigationDecision.prevent;
-            }
+    controller.addJavaScriptHandler(
+      handlerName: 'onBlur',
+      callback: (args) {
+        debugPrint('DEBUG: WebView blurred');
+      },
+    );
+  }
 
-            return NavigationDecision.navigate;
-          },
-        ),
-      );
+  NavigationActionPolicy? _handleUrlLoading(
+    InAppWebViewController controller,
+    NavigationAction navigation,
+  ) {
+    final uri = navigation.request.url;
 
-    // Register with the controller
-    widget.controller.registerViewController(_webViewController);
+    if (uri != null && uri.scheme == 're-callback') {
+      final html = Uri.decodeComponent(uri.path);
+      widget.controller.updateHtml(html);
+      return NavigationActionPolicy.CANCEL;
+    }
+
+    if (uri != null && uri.scheme == 're-state') {
+      final state = Uri.decodeComponent(uri.path);
+      widget.controller.updateDecorationState(state);
+      return NavigationActionPolicy.CANCEL;
+    }
+
+    return NavigationActionPolicy.ALLOW;
   }
 
   @override
@@ -242,15 +237,34 @@ class _RichEditorState extends State<RichEditor> {
     return SizedBox(
       height: widget.height,
       width: widget.width,
-      child: WebViewWidget(controller: _webViewController),
+      child: InAppWebView(
+        initialFile: 'packages/mb_rich_editor/assets/rich_editor/index.html',
+        initialSettings: InAppWebViewSettings(
+          javaScriptEnabled: true,
+          transparentBackground: widget.backgroundColor == null,
+          isInspectable: true,
+          useHybridComposition: true,
+        ),
+        onWebViewCreated: (controller) {
+          _webViewController = controller;
+          widget.controller.registerViewController(controller);
+        },
+        onLoadStop: (controller, url) {
+          _registerJavaScriptHandlers(controller);
+          _applyInitialSettings();
+          widget.controller.setReady(true);
+        },
+        shouldOverrideUrlLoading: (controller, navigation) async =>
+            _handleUrlLoading(controller, navigation),
+      ),
     );
   }
 
   Future<void> _applyInitialSettings() async {
     // Apply placeholder
     if (widget.placeholder.isNotEmpty) {
-      await _webViewController.runJavaScript(
-        'RE.setPlaceholder(\'${widget.placeholder}\');',
+      await _webViewController.evaluateJavascript(
+        source: 'RE.setPlaceholder(\'${widget.placeholder}\');',
       );
     }
 
@@ -258,36 +272,37 @@ class _RichEditorState extends State<RichEditor> {
     if (widget.textColor != null) {
       final color =
           '#${widget.textColor!.toARGB32().toRadixString(16).substring(2)}';
-      await _webViewController.runJavaScript(
-        'RE.setBaseTextColor(\'$color\');',
+      await _webViewController.evaluateJavascript(
+        source: 'RE.setBaseTextColor(\'$color\');',
       );
     }
 
     if (widget.backgroundColor != null) {
       final color =
           '#${widget.backgroundColor!.toARGB32().toRadixString(16).substring(2)}';
-      await _webViewController.runJavaScript(
-        'RE.setBackgroundColor(\'$color\');',
+      await _webViewController.evaluateJavascript(
+        source: 'RE.setBackgroundColor(\'$color\');',
       );
     }
 
     // Apply font size
     if (widget.fontSize != null) {
-      await _webViewController.runJavaScript(
-        'RE.setBaseFontSize(\'${widget.fontSize}px\');',
+      await _webViewController.evaluateJavascript(
+        source: 'RE.setBaseFontSize(\'${widget.fontSize}px\');',
       );
     }
 
     // Apply padding
     if (widget.padding != null) {
-      await _webViewController.runJavaScript(
-        'RE.setPadding(\'${widget.padding!.left}px\', \'${widget.padding!.top}px\', \'${widget.padding!.right}px\', \'${widget.padding!.bottom}px\');',
+      await _webViewController.evaluateJavascript(
+        source:
+            'RE.setPadding(\'${widget.padding!.left}px\', \'${widget.padding!.top}px\', \'${widget.padding!.right}px\', \'${widget.padding!.bottom}px\');',
       );
     }
 
     // Set enabled state
-    await _webViewController.runJavaScript(
-      'RE.setInputEnabled(${widget.enabled});',
+    await _webViewController.evaluateJavascript(
+      source: 'RE.setInputEnabled(${widget.enabled});',
     );
   }
 }

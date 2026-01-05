@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 enum BottomAttachment {
@@ -15,9 +17,16 @@ class EditorUIState extends ChangeNotifier {
   double _keyboardHeight = 0;
   double _savedKeyboardHeight = 250.0; // Default fallback
 
+  // Manual dismiss tracking
+  bool _isManualDismiss = false;
+  Timer? _manualDismissResetTimer;
+  static const Duration _defaultKeyboardAnimationDuration =
+      Duration(milliseconds: 300);
+
   BottomAttachment get activeAttachment => _activeAttachment;
   double get keyboardHeight => _keyboardHeight;
   double get savedKeyboardHeight => _savedKeyboardHeight;
+  bool get isManualDismiss => _isManualDismiss;
 
   bool get isKeyboardVisible => _activeAttachment == BottomAttachment.keyboard;
   bool get isEmojiVisible => _activeAttachment == BottomAttachment.emoji;
@@ -75,5 +84,44 @@ class EditorUIState extends ChangeNotifier {
     } else {
       showEmojiPicker();
     }
+  }
+
+  // ==================== Manual Dismiss Tracking ====================
+
+  /// Marks the keyboard dismissal as intentional (triggered by code).
+  ///
+  /// This flag is used to distinguish between:
+  /// - Manual dismissal: Code calls blur() to hide keyboard and show emoji
+  /// - User dismissal: User taps "Done" or outside to dismiss keyboard
+  ///
+  /// The flag automatically resets after the keyboard animation duration
+  /// (default: 300ms) to allow proper detection of subsequent dismissals.
+  void markManualDismiss() {
+    _isManualDismiss = true;
+    _manualDismissResetTimer?.cancel();
+    _manualDismissResetTimer = Timer(
+      _defaultKeyboardAnimationDuration,
+      _resetManualDismiss,
+    );
+  }
+
+  void _resetManualDismiss() {
+    if (_isManualDismiss) {
+      _isManualDismiss = false;
+      _manualDismissResetTimer = null;
+    }
+  }
+
+  /// Force reset the manual dismiss flag (for edge cases)
+  void forceResetManualDismiss() {
+    _manualDismissResetTimer?.cancel();
+    _manualDismissResetTimer = null;
+    _isManualDismiss = false;
+  }
+
+  @override
+  void dispose() {
+    _manualDismissResetTimer?.cancel();
+    super.dispose();
   }
 }

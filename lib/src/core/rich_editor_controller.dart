@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../emoji/models/emoji.dart';
 import '../mention/models/mention.dart';
@@ -11,7 +10,7 @@ import '../mention/models/mention.dart';
 /// Manages state, executes commands, and handles JavaScript communication.
 ///
 class RichEditorController extends ChangeNotifier {
-  WebViewController? _webViewController;
+  InAppWebViewController? _webViewController;
   bool _isReady = false;
   String _html = '';
   final List<String> _activeStates = [];
@@ -42,7 +41,7 @@ class RichEditorController extends ChangeNotifier {
   ValueChanged<String?>? onMentionSelected;
 
   /// Register the WebView controller
-  void registerViewController(WebViewController controller) {
+  void registerViewController(InAppWebViewController controller) {
     _webViewController = controller;
   }
 
@@ -425,13 +424,13 @@ class RichEditorController extends ChangeNotifier {
   /// Focus the editor
   Future<void> focus() async {
     await _evalJs('RE.focus();');
-    SystemChannels.textInput.invokeMethod('TextInput.show');
+    _webViewController?.showInputMethod();
   }
 
   /// Blur (unfocus) the editor
   Future<void> blur() async {
     await _evalJs('RE.blurFocus();');
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
+    _webViewController?.hideInputMethod();
   }
 
   /// Enable/disable editing
@@ -449,7 +448,7 @@ class RichEditorController extends ChangeNotifier {
     }
 
     try {
-      await _webViewController!.runJavaScript(code);
+      await _webViewController!.evaluateJavascript(source: code);
       return null;
     } catch (e) {
       debugPrint('Error evaluating JavaScript: $e\nCode: $code');
