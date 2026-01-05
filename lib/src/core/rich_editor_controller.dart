@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../emoji/models/emoji.dart';
@@ -424,14 +423,14 @@ class RichEditorController extends ChangeNotifier {
 
   /// Focus the editor
   Future<void> focus() async {
-    SystemChannels.textInput.invokeMethod('TextInput.show');
     await _evalJs('RE.focus();');
+    _webViewController?.showInputMethod();
   }
 
   /// Blur (unfocus) the editor
   Future<void> blur() async {
     await _evalJs('RE.blurFocus();');
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
+    _webViewController?.hideInputMethod();
   }
 
   /// Enable/disable editing
