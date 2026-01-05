@@ -424,8 +424,8 @@ class RichEditorController extends ChangeNotifier {
 
   /// Focus the editor
   Future<void> focus() async {
-    await _evalJs('RE.focus();');
     SystemChannels.textInput.invokeMethod('TextInput.show');
+    await _evalJs('RE.focus();');
   }
 
   /// Blur (unfocus) the editor
