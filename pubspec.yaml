@@ -27,4 +27,4 @@ flutter:
 
   # Assets for rich editor
   assets:
-    - assets/rich_editor/
+    - assets/summernote/

@@ -529,6 +529,94 @@ RichEditor(
 )
 ```
 
+### Custom Summernote Options
+
+The editor supports injecting custom Summernote options at initialization:
+
+```dart
+RichEditor(
+  controller: controller,
+  customSummernoteOptions: {
+    'height': 400,
+    'minHeight': 200,
+    'maxHeight': 600,
+    'placeholder': 'Write your story...',
+    'fontSizes': ['8', '9', '10', '11', '12', '14', '18', '24', '36'],
+    'dialogsInBody': true,
+  },
+)
+```
+
+**Available options include:**
+- `height`, `minHeight`, `maxHeight` - Editor height constraints
+- `toolbar` - Custom toolbar configuration
+- `placeholder` - Placeholder text
+- `fontSizes` - Array of font size options
+- `dialogsInBody` - Render dialogs in body instead of editor
+- And any other [Summernote option](https://summernote.org/deep-dive/#initialization-options)
+
+### Custom Summernote Callbacks
+
+Receive type-safe callbacks from JavaScript events directly in Dart:
+
+```dart
+RichEditor(
+  controller: controller,
+  summernoteCallbacks: SummernoteCallbacks(
+    onInit: () {
+      print('Editor is ready!');
+    },
+    onChange: (contents) {
+      print('Content changed: ${contents.length} chars');
+    },
+    onFocus: () {
+      print('Editor focused');
+    },
+    onBlur: () {
+      print('Editor blurred');
+    },
+    onPaste: (event) {
+      print('Pasted!');
+    },
+    onKeydown: (event) {
+      if (event['key'] == 'Enter') {
+        print('Enter pressed - custom handling');
+      }
+    },
+    onStateChange: (state) {
+      // Type-safe toolbar state object
+      print('Bold: ${state.bold}');
+      print('Italic: ${state.italic}');
+      print('Heading: H${state.headingLevel}');
+      print('Has list: ${state.hasList}');
+
+      // Update custom toolbar UI
+      setState(() {
+        isBold = state.bold;
+        isItalic = state.italic;
+      });
+    },
+  ),
+)
+```
+
+**Available callbacks:**
+- `onInit` - Editor initialized
+- `onChange` - Content changed
+- `onFocus` - Editor gained focus
+- `onBlur` - Editor lost focus
+- `onKeydown` - Key pressed
+- `onKeyup` - Key released
+- `onPaste` - Content pasted
+- `onImageUpload` - Images uploaded
+- `onEnter` - Enter key pressed
+- `onStateChange` - Toolbar formatting state changed
+
+**SummernoteToolbarState properties:**
+- Boolean flags: `bold`, `italic`, `underline`, `strikeThrough`, `subscript`, `superscript`, `orderedList`, `unorderedList`, `justifyLeft`, `justifyCenter`, `justifyRight`, `justifyFull`
+- `formatBlock` - Current block format (e.g., 'h1', 'p', 'blockquote', 'pre')
+- Helper methods: `hasAnyFormatting`, `hasList`, `hasAlignment`, `isHeading`, `headingLevel`, `isBlockquote`, `isCodeBlock`, `isParagraph`
+
 ## Platform Support
 
 - Android

@@ -45,6 +45,143 @@ RE.currentSelection = {
   "endOffset": 0
 };
 
+// ==================== Default Summernote Options ====================
+
+const defaultSummernoteOptions = {
+  placeholder: 'Enter text here...',
+  tabsize: 2,
+  toolbar: [], // Hide toolbar - we use Flutter toolbar
+  callbacks: {
+    onInit: function () {
+      console.log('Summernote initialized');
+      // Call Dart callback if registered
+      _callDartCallback('onInit');
+    },
+    onChange: function (contents, $editable) {
+      RE.callback();
+      // Call Dart callback if registered
+      _callDartCallback('onChange', contents);
+    },
+    onFocus: function () {
+      if (window.flutter_inappwebview) {
+        window.flutter_inappwebview.callHandler('onFocus', 'focused');
+      }
+      // Call Dart callback if registered
+      _callDartCallback('onFocus');
+    },
+    onBlur: function () {
+      if (window.flutter_inappwebview) {
+        window.flutter_inappwebview.callHandler('onBlur', 'blurred');
+      }
+      // Call Dart callback if registered
+      _callDartCallback('onBlur');
+    },
+    onKeyup: function (e) {
+      RE.enabledEditingItems();
+      RE.handleKeyup(e);
+      // Call Dart callback if registered
+      _callDartCallback('onKeyup', _eventToMap(e));
+    },
+    onKeydown: function (e) {
+      RE.handleKeydown(e);
+      // Call Dart callback if registered
+      _callDartCallback('onKeydown', _eventToMap(e));
+    },
+    onMouseup: function (e) {
+      RE.enabledEditingItems();
+    },
+    onPaste: function (e) {
+      // Call Dart callback if registered
+      _callDartCallback('onPaste', _eventToMap(e));
+    },
+    onImageUpload: function (files) {
+      // Convert FileList to array of data URLs or names
+      const fileInfos = [];
+      for (let i = 0; i < files.length; i++) {
+        fileInfos.push(files[i].name);
+      }
+      // Call Dart callback if registered
+      _callDartCallback('onImageUpload', fileInfos);
+    },
+    onEnter: function () {
+      // Call Dart callback if registered
+      _callDartCallback('onEnter');
+    }
+  }
+};
+
+// ==================== Callback Bridge Utilities ====================
+
+/**
+ * Call a Dart callback if it has been registered
+ * @param {string} callbackName - Name of the callback (e.g., 'onInit', 'onChange')
+ * @param {*} arg - Argument to pass to the callback
+ */
+function _callDartCallback(callbackName, arg) {
+  if (!window.availableSummernoteCallbacks) return;
+
+  // Check if this callback was registered in Dart
+  if (window.availableSummernoteCallbacks.includes(callbackName)) {
+    const handlerName = 'summernote_' + callbackName;
+    if (window.flutter_inappwebview) {
+      // Single argument - pass as array
+      if (arg !== undefined) {
+        window.flutter_inappwebview.callHandler(handlerName, arg);
+      } else {
+        window.flutter_inappwebview.callHandler(handlerName);
+      }
+    }
+  }
+}
+
+/**
+ * Convert a DOM event to a plain object/map for passing to Dart
+ * @param {Event} e - The DOM event
+ * @returns {Object} Plain object representation of the event
+ */
+function _eventToMap(e) {
+  if (!e) return {};
+
+  return {
+    type: e.type || '',
+    key: e.key || '',
+    code: e.code || '',
+    keyCode: e.keyCode || 0,
+    which: e.which || 0,
+    ctrlKey: e.ctrlKey || false,
+    shiftKey: e.shiftKey || false,
+    altKey: e.altKey || false,
+    metaKey: e.metaKey || false,
+    preventDefault: typeof e.preventDefault === 'function',
+  };
+}
+
+// ==================== Deep Merge Utility ====================
+
+function deepMerge(target, source) {
+  const output = { ...target };
+
+  if (isObject(target) && isObject(source)) {
+    Object.keys(source).forEach(key => {
+      if (isObject(source[key])) {
+        if (!(key in target)) {
+          Object.assign(output, { [key]: source[key] });
+        } else {
+          output[key] = deepMerge(target[key], source[key]);
+        }
+      } else {
+        Object.assign(output, { [key]: source[key] });
+      }
+    });
+  }
+
+  return output;
+}
+
+function isObject(item) {
+  return item && typeof item === 'object' && !Array.isArray(item);
+}
+
 // ==================== Initialize Summernote ====================
 
 // Wait for jQuery to be available
@@ -57,47 +194,28 @@ function initSummernote() {
 
   $editor = $('#editor');
 
+  // Merge custom options from Dart with defaults (non-callback options only)
+  const customOptions = window.customSummernoteOptions || {};
 
-  $editor.summernote({
-    placeholder: 'Enter text here...',
-    tabsize: 2,
-    toolbar: [], // Hide toolbar - we use Flutter toolbar
-    callbacks: {
-      onInit: function () {
-        console.log('Summernote initialized');
-      },
-      onChange: function (contents, $editable) {
-        RE.callback();
-      },
-      onFocus: function () {
-        if (window.flutter_inappwebview) {
-          window.flutter_inappwebview.callHandler('onFocus', 'focused');
-        }
-      },
-      onBlur: function () {
-        if (window.flutter_inappwebview) {
-          window.flutter_inappwebview.callHandler('onBlur', 'blurred');
-        }
-      },
-      onKeyup: function (e) {
-        RE.enabledEditingItems();
-        RE.handleKeyup(e);
-      },
-      onKeydown: function (e) {
-        RE.handleKeydown(e);
-      },
-      onMouseup: function (e) {
-        RE.enabledEditingItems();
-      }
-    }
-  });
+  // Remove 'callbacks' from custom options - we handle those separately
+  delete customOptions.callbacks;
+
+  const finalOptions = deepMerge(defaultSummernoteOptions, customOptions);
+
+  // Initialize Summernote with merged options
+  $editor.summernote(finalOptions);
 
   // Store reference to the editable element
   RE.editor = $editor.next('.note-editor').find('.note-editable')[0];
 }
 
-// Start initialization when script loads
-initSummernote();
+// Manual initialization trigger (called from Dart)
+RE.initSummernote = function() {
+  initSummernote();
+};
+
+// NOTE: Auto-initialization removed - will be triggered from Dart after options are set
+// initSummernote();
 
 // ==================== Callback System ====================
 
@@ -428,6 +546,9 @@ RE.restorerange = function () {
 
 // ==================== State Detection ====================
 
+// Track previous states to avoid duplicate callbacks
+let previousStateMap = {};
+
 RE.enabledEditingItems = function () {
   var items = [];
 
@@ -451,6 +572,7 @@ RE.enabledEditingItems = function () {
 
   const stateString = items.join(',');
 
+  // Original callback for backward compatibility
   if (stateString !== lastStateString) {
     if (stateCallbackTimeout) {
       clearTimeout(stateCallbackTimeout);
@@ -462,6 +584,36 @@ RE.enabledEditingItems = function () {
         window.flutter_inappwebview.callHandler('onDecorationState', stateString);
       }
     }, 50);
+  }
+
+  // NEW: Also call Dart callback if registered (as Map<String, bool> + String>)
+  const stateMap = {};
+  stateMap['bold'] = items.includes('bold');
+  stateMap['italic'] = items.includes('italic');
+  stateMap['underline'] = items.includes('underline');
+  stateMap['strikeThrough'] = items.includes('strikeThrough');
+  stateMap['subscript'] = items.includes('subscript');
+  stateMap['superscript'] = items.includes('superscript');
+  stateMap['orderedList'] = items.includes('orderedList');
+  stateMap['unorderedList'] = items.includes('unorderedList');
+  stateMap['justifyLeft'] = items.includes('justifyLeft');
+  stateMap['justifyCenter'] = items.includes('justifyCenter');
+  stateMap['justifyRight'] = items.includes('justifyRight');
+  stateMap['justifyFull'] = items.includes('justifyFull');
+  stateMap['formatBlock'] = formatBlock || ''; // NEW: Include format block
+
+  // Check if state changed
+  let stateChanged = false;
+  for (const key in stateMap) {
+    if (previousStateMap[key] !== stateMap[key]) {
+      stateChanged = true;
+      break;
+    }
+  }
+
+  if (stateChanged) {
+    previousStateMap = { ...stateMap };
+    _callDartCallback('onStateChange', stateMap);
   }
 };
 

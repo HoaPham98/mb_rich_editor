@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'rich_editor_controller.dart';
 import '../mention/models/mention.dart';
+import '../models/summernote_callbacks.dart';
 import '../plugin/rich_editor_plugin.dart';
 
 ///
@@ -70,6 +71,35 @@ class RichEditor extends StatefulWidget {
   /// Plugins can inject JavaScript and register handlers
   final List<RichEditorPlugin> plugins;
 
+  /// Custom Summernote options to inject at initialization.
+  /// Use this for non-callback options like height, toolbar, styling, etc.
+  ///
+  /// Example:
+  /// ```dart
+  /// customSummernoteOptions: {
+  ///   'height': 300,
+  ///   'toolbar': [
+  ///     ['style', ['style']],
+  ///     ['font', ['bold', 'italic', 'underline']]
+  ///   ],
+  ///   'fontSizes': ['8', '9', '10', '11', '12', '14', '18', '24', '36'],
+  /// }
+  /// ```
+  final Map<String, dynamic>? customSummernoteOptions;
+
+  /// Custom Summernote callbacks provided as Dart functions.
+  /// These are bridged to JavaScript and called when Summernote events occur.
+  ///
+  /// Example:
+  /// ```dart
+  /// summernoteCallbacks: SummernoteCallbacks(
+  ///   onInit: () => print('Editor ready!'),
+  ///   onChange: (contents) => print('Content changed: $contents'),
+  ///   onStateChange: (state) => print('Bold: ${state.bold}'),
+  /// )
+  /// ```
+  final SummernoteCallbacks? summernoteCallbacks;
+
   const RichEditor({
     super.key,
     required this.controller,
@@ -87,6 +117,8 @@ class RichEditor extends StatefulWidget {
     this.autoFocus = false,
     this.useSummernote = true,
     this.plugins = const [],
+    this.customSummernoteOptions,
+    this.summernoteCallbacks,
   });
 
   @override
@@ -266,6 +298,22 @@ class _RichEditorState extends State<RichEditor> {
         },
         onLoadStop: (controller, url) async {
           _registerJavaScriptHandlers(controller);
+
+          // IMPORTANT: Register Summernote callback handlers BEFORE initialization
+          if (widget.summernoteCallbacks != null) {
+            await _registerSummernoteCallbackHandlers(controller);
+          }
+
+          // Inject custom options (non-callback options)
+          if (widget.customSummernoteOptions != null) {
+            await _injectCustomSummernoteOptions(controller);
+          }
+
+          // Trigger Summernote initialization
+          if (widget.useSummernote) {
+            await controller.evaluateJavascript(source: 'RE.initSummernote();');
+          }
+
           await _registerPlugins(controller);
           _applyInitialSettings();
           widget.controller.setReady(true);
@@ -274,6 +322,103 @@ class _RichEditorState extends State<RichEditor> {
             _handleUrlLoading(controller, navigation),
       ),
     );
+  }
+
+  /// Register JavaScript handlers for Summernote callbacks
+  Future<void> _registerSummernoteCallbackHandlers(
+      InAppWebViewController controller) async {
+    final callbacks = widget.summernoteCallbacks!;
+    final callbackNames = callbacks.providedCallbackNames;
+
+    // Register handler for each provided callback
+    for (final name in callbackNames) {
+      final handlerName = 'summernote_$name';
+      controller.addJavaScriptHandler(
+        handlerName: handlerName,
+        callback: (args) {
+          _handleSummernoteCallback(name, args);
+        },
+      );
+    }
+
+    // Notify JS which callbacks are available
+    await controller.evaluateJavascript(
+      source: 'window.availableSummernoteCallbacks = ${jsonEncode(callbackNames)};',
+    );
+  }
+
+  /// Handle incoming Summernote callback from JavaScript
+  void _handleSummernoteCallback(String callbackName, List<dynamic> args) {
+    final callbacks = widget.summernoteCallbacks!;
+
+    switch (callbackName) {
+      case 'onInit':
+        callbacks.onInit?.call();
+        break;
+      case 'onChange':
+        if (args.isNotEmpty) {
+          callbacks.onChange?.call(args[0].toString());
+        }
+        break;
+      case 'onBlur':
+        callbacks.onBlur?.call();
+        break;
+      case 'onFocus':
+        callbacks.onFocus?.call();
+        break;
+      case 'onKeydown':
+        if (args.isNotEmpty && args[0] is Map) {
+          callbacks.onKeydown?.call(Map<String, dynamic>.from(args[0] as Map));
+        }
+        break;
+      case 'onKeyup':
+        if (args.isNotEmpty && args[0] is Map) {
+          callbacks.onKeyup?.call(Map<String, dynamic>.from(args[0] as Map));
+        }
+        break;
+      case 'onPaste':
+        if (args.isNotEmpty && args[0] is Map) {
+          callbacks.onPaste?.call(Map<String, dynamic>.from(args[0] as Map));
+        }
+        break;
+      case 'onImageUpload':
+        if (args.isNotEmpty) {
+          final files = (args[0] as List).map((e) => e.toString()).toList();
+          callbacks.onImageUpload?.call(files);
+        }
+        break;
+      case 'onEnter':
+        callbacks.onEnter?.call();
+        break;
+      case 'onLanguage':
+        if (args.isNotEmpty) {
+          final locale = args[0].toString();
+          callbacks.onLanguage?.call(locale);
+        }
+        break;
+      case 'onStateChange':
+        if (args.isNotEmpty && args[0] is Map) {
+          final stateMap = Map<String, dynamic>.from(args[0] as Map);
+          final toolbarState = SummernoteToolbarState.fromMap(stateMap);
+          callbacks.onStateChange?.call(toolbarState);
+        }
+        break;
+    }
+  }
+
+  /// Inject custom Summernote options before initialization
+  Future<void> _injectCustomSummernoteOptions(
+      InAppWebViewController controller) async {
+    if (widget.customSummernoteOptions == null) return;
+
+    try {
+      final jsonString = jsonEncode(widget.customSummernoteOptions);
+      await controller.evaluateJavascript(
+        source: 'window.customSummernoteOptions = $jsonString;',
+      );
+    } catch (e) {
+      debugPrint('Error injecting custom Summernote options: $e');
+    }
   }
 
   /// Register all plugins with the WebView

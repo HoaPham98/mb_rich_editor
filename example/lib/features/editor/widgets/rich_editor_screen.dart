@@ -76,7 +76,7 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
     );
 
     _setupControllerCallbacks();
-    _loadInitialHtml();
+    // _loadInitialHtml();
   }
 
   void _setupControllerCallbacks() {
@@ -192,6 +192,9 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
                         child: mb.RichEditor(
                           controller: _controller,
                           placeholder: 'Start typing...',
+                          customSummernoteOptions: {
+                            'blockquoteBreakingLevel': 1,
+                          },
                           padding: const EdgeInsets.all(16.0),
                           onTextChange: (html) {
                             _currentHtml = html;
@@ -265,3 +268,134 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
     );
   }
 }
+
+// ==================== EXAMPLE USAGE ====================
+//
+// Below are examples of how to use the new custom Summernote options and callbacks:
+//
+// Example 1: Basic styling options
+// ```dart
+// mb.RichEditor(
+//   controller: _controller,
+//   customSummernoteOptions: {
+//     'height': 400,
+//     'minHeight': 200,
+//     'placeholder': 'Write your story...',
+//     'fontSizes': ['8', '9', '10', '11', '12', '14', '18', '24', '36'],
+//   },
+// )
+// ```
+//
+// Example 2: Custom toolbar
+// ```dart
+// mb.RichEditor(
+//   controller: _controller,
+//   customSummernoteOptions: {
+//     'toolbar': [
+//       ['style', ['style']],
+//       ['font', ['bold', 'italic', 'underline', 'clear']],
+//       ['fontsize', ['fontsize']],
+//       ['color', ['color']],
+//       ['para', ['ul', 'ol', 'paragraph']],
+//       ['insert', ['link', 'picture', 'video']],
+//       ['view', ['fullscreen', 'codeview']],
+//     ],
+//   },
+// )
+// ```
+//
+// Example 3: Dart callbacks (full Dart customization)
+// ```dart
+// mb.RichEditor(
+//   controller: _controller,
+//   summernoteCallbacks: mb.SummernoteCallbacks(
+//     onInit: () {
+//       print('Editor is ready!');
+//       // Can trigger UI updates, show notifications, etc.
+//     },
+//     onChange: (contents) {
+//       print('Content changed, length: ${contents.length}');
+//       // Can trigger auto-save, word count update, etc.
+//     },
+//     onFocus: () {
+//       print('Editor focused');
+//       // Can show keyboard, custom toolbar, etc.
+//     },
+//     onBlur: () {
+//       print('Editor blurred');
+//       // Can hide keyboard, save state, etc.
+//     },
+//     onPaste: (event) {
+//       print('Pasted: key=${event['key']}');
+//       // Can sanitize paste, show custom dialog, etc.
+//     },
+//     onKeydown: (event) {
+//       if (event['key'] == 'Enter') {
+//         print('Enter pressed');
+//         // Can handle custom Enter behavior
+//       }
+//     },
+//     onStateChange: (state) {
+//       // Receive toolbar state changes as typed object
+//       print('Bold enabled: ${state.bold}');
+//       print('Italic enabled: ${state.italic}');
+//       print('Underline enabled: ${state.underline}');
+//       print('OrderedList enabled: ${state.orderedList}');
+//       print('UnorderedList enabled: ${state.unorderedList}');
+//       print('Format block: ${state.formatBlock}');
+//       print('Is heading: ${state.isHeading}');
+//       print('Heading level: ${state.headingLevel}');
+//       print('Any formatting: ${state.hasAnyFormatting}');
+//       // Can update custom toolbar UI, enable/disable buttons, etc.
+//     },
+//   ),
+// )
+// ```
+//
+// Example 4: Combined - options + callbacks
+// ```dart
+// mb.RichEditor(
+//   controller: _controller,
+//   customSummernoteOptions: {
+//     'height': 300,
+//     'dialogsInBody': true,
+//   },
+//   summernoteCallbacks: mb.SummernoteCallbacks(
+//     onInit: () => print('Ready'),
+//     onChange: (contents) => print('Changed: ${contents.length} chars'),
+//     onStateChange: (state) {
+//       // Update custom toolbar button states using typed object
+//       setState(() {
+//         isBold = state.bold;
+//         isItalic = state.italic;
+//         isUnderline = state.underline;
+//         hasList = state.hasList;
+//         hasAlignment = state.hasAlignment;
+//       });
+//     },
+//   ),
+// )
+// ```
+//
+// Example 5: Using SummernoteToolbarState helper methods
+// ```dart
+// onStateChange: (state) {
+//   // Type-safe access with IDE autocomplete
+//   if (state.bold) {
+//     // Bold button should be highlighted
+//   }
+//   if (state.hasList) {
+//     // Disable indent buttons
+//   }
+//   if (state.isHeading) {
+//     // Show heading level in toolbar
+//     print('Current heading: H${state.headingLevel}');
+//   }
+//   if (state.isBlockquote) {
+//     // Highlight quote button
+//   }
+//   if (state.formatBlock == 'pre') {
+//     // Show code block indicator
+//   }
+// }
+// ```
