@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
+import '../css/custom_css.dart';
 import '../emoji/models/emoji.dart';
 import '../mention/models/mention.dart';
 
@@ -438,6 +440,106 @@ class RichEditorController extends ChangeNotifier {
     await _evalJs('RE.setInputEnabled($enabled);');
   }
 
+  // ==================== Custom CSS Methods ====================
+
+  /// Inject custom CSS from a string.
+  ///
+  /// Example:
+  /// ```dart
+  /// await controller.injectCustomCSS(
+  ///   'customTheme',
+  ///   '.note-editable { font-family: "Georgia", serif; }',
+  /// );
+  /// ```
+  Future<void> injectCustomCSS(
+    String cssName,
+    String cssContent, {
+    CSSScope scope = CSSScope.editor,
+    int priority = 100,
+  }) async {
+    final escapedCss = _escapeJavaScript(cssContent);
+    final scopeStr = scope.name;
+    await _evalJs(
+      'RE.injectCustomCSS("$cssName", `$escapedCss`, {scope: "$scopeStr", priority: $priority});',
+    );
+  }
+
+  /// Inject custom CSS from a Flutter asset.
+  ///
+  /// Example:
+  /// ```dart
+  /// await controller.injectCustomCSSFromAsset(
+  ///   'darkMode',
+  ///   'assets/css/dark_mode.css',
+  ///   scope: CSSScope.global,
+  /// );
+  /// ```
+  ///
+  /// Note: This requires `flutter/services.dart` for `rootBundle`.
+  /// You may need to add this import if not already present:
+  /// ```dart
+  /// import 'package:flutter/services.dart' show rootBundle;
+  /// ```
+  Future<void> injectCustomCSSFromAsset(
+    String cssName,
+    String assetPath, {
+    CSSScope scope = CSSScope.editor,
+    int priority = 100,
+  }) async {
+    // Import rootBundle locally to avoid circular dependency
+    final assetContent = await _loadAsset(assetPath);
+    final escapedCss = _escapeJavaScript(assetContent);
+    final scopeStr = scope.name;
+    await _evalJs(
+      'RE.injectCustomCSSFromAsset("$cssName", `$escapedCss`, {scope: "$scopeStr", priority: $priority});',
+    );
+  }
+
+  /// Inject custom CSS from a URL.
+  ///
+  /// Example:
+  /// ```dart
+  /// await controller.injectCustomCSSFromUrl(
+  ///   'fontAwesome',
+  ///   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
+  ///   scope: CSSScope.global,
+  /// );
+  /// ```
+  Future<void> injectCustomCSSFromUrl(
+    String cssName,
+    String cssUrl, {
+    CSSScope scope = CSSScope.editor,
+    int priority = 100,
+  }) async {
+    final scopeStr = scope.name;
+    await _evalJs(
+      'RE.injectCustomCSSFromUrl("$cssName", "$cssUrl", {scope: "$scopeStr", priority: $priority})',
+    );
+  }
+
+  /// Remove a previously injected CSS.
+  ///
+  /// Returns true if the CSS was found and removed.
+  Future<bool> removeCustomCSS(String cssName) async {
+    final result = await _evalJs('RE.removeCustomCSS("$cssName");');
+    return result == true;
+  }
+
+  /// Clear all injected custom CSS.
+  ///
+  /// Optionally filter by scope. Returns the number of CSS rules removed.
+  Future<int> clearAllCustomCSS({CSSScope? scope}) async {
+    final scopeParam = scope != null ? '{scope: "${scope.name}"}' : '';
+    final result = await _evalJs('RE.clearAllCustomCSS($scopeParam);');
+    return (result as num?)?.toInt() ?? 0;
+  }
+
+  /// Check if a CSS with the given name is currently injected.
+  Future<bool> hasCustomCSS(String cssName) async {
+    final result = await _evalJs('RE.hasCustomCSS("$cssName");');
+    return result == true;
+  }
+
   // ==================== Private Methods ====================
 
   /// Evaluate JavaScript code
@@ -452,6 +554,24 @@ class RichEditorController extends ChangeNotifier {
       return null;
     } catch (e) {
       debugPrint('Error evaluating JavaScript: $e\nCode: $code');
+      rethrow;
+    }
+  }
+
+  /// Escape JavaScript string literals (handles backticks, backslashes, etc.)
+  String _escapeJavaScript(String input) {
+    return input
+        .replaceAll('\\', '\\\\')
+        .replaceAll('`', '\\`')
+        .replaceAll('\$', '\\\$');
+  }
+
+  /// Load asset content from Flutter assets
+  Future<String> _loadAsset(String assetPath) async {
+    try {
+      return await rootBundle.loadString(assetPath);
+    } catch (e) {
+      debugPrint('Error loading asset: $e');
       rethrow;
     }
   }

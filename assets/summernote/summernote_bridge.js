@@ -255,7 +255,6 @@ RE.getText = function () {
 };
 
 RE.insertHTML = function (html) {
-  RE.restorerange();
   $editor.summernote('pasteHTML', html);
 };
 
@@ -829,6 +828,207 @@ RE.registerPluginCallback = function (pluginName, callbackName) {
       window.flutter_inappwebview.callHandler('plugin_' + pluginName + '_' + callbackName, data);
     }
   };
+};
+
+// ==================== Custom CSS Injection Support ====================
+
+// Store injected CSS styles for management
+RE.injectedCSS = new Map(); // name -> {element, source, timestamp}
+
+/**
+ * Inject custom CSS from a raw CSS string.
+ * @param {string} cssName - Unique identifier for this CSS
+ * @param {string} cssContent - The CSS content to inject
+ * @param {Object} options - Optional configuration
+ * @returns {boolean} True if injected successfully
+ */
+RE.injectCustomCSS = function (cssName, cssContent, options = {}) {
+  const { scope = 'editor', priority = 100 } = options;
+
+  // Remove existing CSS with same name if it exists
+  if (RE.injectedCSS.has(cssName)) {
+    RE.removeCustomCSS(cssName);
+  }
+
+  // Create style element
+  const styleElement = document.createElement('style');
+  styleElement.setAttribute('data-css-name', cssName);
+  styleElement.setAttribute('data-priority', priority);
+  styleElement.textContent = cssContent;
+
+  // Determine insertion point based on scope
+  if (scope === 'global') {
+    styleElement.id = `custom-css-global-${cssName}`;
+    document.head.appendChild(styleElement);
+  } else {
+    styleElement.id = `custom-css-editor-${cssName}`;
+    const editorContainer = document.querySelector('.note-editor');
+    if (editorContainer) {
+      editorContainer.appendChild(styleElement);
+    } else {
+      document.head.appendChild(styleElement);
+    }
+  }
+
+  // Store reference
+  RE.injectedCSS.set(cssName, {
+    element: styleElement,
+    source: 'string',
+    timestamp: Date.now(),
+    scope: scope,
+    priority: priority
+  });
+
+  console.log('Custom CSS injected:', cssName, 'Scope:', scope);
+  return true;
+};
+
+/**
+ * Inject custom CSS from a URL (external stylesheet).
+ * @param {string} cssName - Unique identifier for this CSS
+ * @param {string} cssUrl - The URL to load the CSS from
+ * @returns {Promise} Resolves when loaded, rejects on error
+ */
+RE.injectCustomCSSFromUrl = function (cssName, cssUrl, options = {}) {
+  return new Promise((resolve, reject) => {
+    // Check if already loaded
+    if (RE.injectedCSS.has(cssName)) {
+      console.log('CSS already loaded:', cssName);
+      resolve();
+      return;
+    }
+
+    const { scope = 'editor', priority = 100 } = options;
+
+    // Create link element
+    const linkElement = document.createElement('link');
+    linkElement.rel = 'stylesheet';
+    linkElement.href = cssUrl;
+    linkElement.setAttribute('data-css-name', cssName);
+    linkElement.setAttribute('data-priority', priority);
+
+    linkElement.onload = () => {
+      RE.injectedCSS.set(cssName, {
+        element: linkElement,
+        source: 'url',
+        url: cssUrl,
+        timestamp: Date.now(),
+        scope: scope,
+        priority: priority
+      });
+      console.log('Custom CSS loaded from URL:', cssName, cssUrl);
+      resolve();
+    };
+
+    linkElement.onerror = () => {
+      reject(new Error('Failed to load CSS: ' + cssUrl));
+    };
+
+    // Insert based on scope
+    if (scope === 'global') {
+      linkElement.id = `custom-css-global-${cssName}`;
+      document.head.appendChild(linkElement);
+    } else {
+      linkElement.id = `custom-css-editor-${cssName}`;
+      const editorContainer = document.querySelector('.note-editor');
+      if (editorContainer) {
+        editorContainer.appendChild(linkElement);
+      } else {
+        document.head.appendChild(linkElement);
+      }
+    }
+  });
+};
+
+/**
+ * Inject custom CSS from a Flutter asset (content injected as string).
+ * @param {string} cssName - Unique identifier for this CSS
+ * @param {string} assetContent - The CSS content from the asset
+ * @returns {boolean} True if injected successfully
+ */
+RE.injectCustomCSSFromAsset = function (cssName, assetContent, options = {}) {
+  return RE.injectCustomCSS(cssName, assetContent, {
+    ...options,
+    source: 'asset'
+  });
+};
+
+/**
+ * Remove a previously injected CSS by name.
+ * @param {string} cssName - The name of the CSS to remove
+ * @returns {boolean} True if removed, false if not found
+ */
+RE.removeCustomCSS = function (cssName) {
+  const cssData = RE.injectedCSS.get(cssName);
+  if (!cssData) {
+    console.warn('CSS not found:', cssName);
+    return false;
+  }
+
+  // Remove the element from DOM
+  if (cssData.element && cssData.element.parentNode) {
+    cssData.element.parentNode.removeChild(cssData.element);
+  }
+
+  // Remove from tracking
+  RE.injectedCSS.delete(cssName);
+  console.log('Custom CSS removed:', cssName);
+  return true;
+};
+
+/**
+ * Clear all injected custom CSS.
+ * @param {Object} options - Optional filters
+ * @returns {number} Number of CSS rules removed
+ */
+RE.clearAllCustomCSS = function (options = {}) {
+  const { scope } = options;
+  let removedCount = 0;
+
+  const namesToRemove = [];
+  for (const [name, cssData] of RE.injectedCSS.entries()) {
+    if (scope && cssData.scope !== scope) {
+      continue;
+    }
+    namesToRemove.push(name);
+  }
+
+  namesToRemove.forEach(name => {
+    if (RE.removeCustomCSS(name)) {
+      removedCount++;
+    }
+  });
+
+  console.log('Cleared', removedCount, 'custom CSS rules');
+  return removedCount;
+};
+
+/**
+ * Check if a CSS with the given name is currently injected.
+ * @param {string} cssName - The name to check
+ * @returns {boolean} True if injected
+ */
+RE.hasCustomCSS = function (cssName) {
+  return RE.injectedCSS.has(cssName);
+};
+
+/**
+ * Get information about all injected CSS.
+ * @returns {Array} Array of objects with CSS metadata
+ */
+RE.getInjectedCSSInfo = function () {
+  const info = [];
+  for (const [name, cssData] of RE.injectedCSS.entries()) {
+    info.push({
+      name: name,
+      source: cssData.source,
+      scope: cssData.scope,
+      priority: cssData.priority,
+      timestamp: cssData.timestamp,
+      url: cssData.url
+    });
+  }
+  return info;
 };
 
 // Re-export RE globally (in case it was already referenced before)

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'rich_editor_controller.dart';
+import '../css/custom_css.dart';
 import '../mention/models/mention.dart';
 import '../models/summernote_callbacks.dart';
 import '../plugin/summernote_plugin.dart';
@@ -117,6 +118,29 @@ class RichEditor extends StatefulWidget {
   /// ```
   final SummernoteCallbacks? summernoteCallbacks;
 
+  /// Custom CSS to inject into the editor.
+  ///
+  /// CSS can be provided from:
+  /// - Raw strings (via `CustomCSS.fromString`)
+  /// - Flutter asset bundles (via `CustomCSS.fromAsset`)
+  /// - External URLs (via `CustomCSS.fromUrl`)
+  ///
+  /// Example:
+  /// ```dart
+  /// customCSS: [
+  ///   CustomCSS.fromString(
+  ///     'customTheme',
+  ///     '.note-editable { font-family: "Georgia", serif; }',
+  ///   ),
+  ///   CustomCSS.fromUrl(
+  ///     'fontAwesome',
+  ///     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
+  ///     scope: CSSScope.global,
+  ///   ),
+  /// ]
+  /// ```
+  final List<CustomCSS> customCSS;
+
   const RichEditor({
     super.key,
     required this.controller,
@@ -136,6 +160,7 @@ class RichEditor extends StatefulWidget {
     this.plugins = const [],
     this.customSummernoteOptions,
     this.summernoteCallbacks,
+    this.customCSS = const [],
   });
 
   @override
@@ -144,6 +169,7 @@ class RichEditor extends StatefulWidget {
 
 class _RichEditorState extends State<RichEditor> {
   late InAppWebViewController _webViewController;
+  List<CustomCSS> _pendingEditorCSS = [];
 
   @override
   void initState() {
@@ -324,17 +350,20 @@ class _RichEditorState extends State<RichEditor> {
           // Step 2: Initialize Summernote plugins (load scripts, configure options)
           await _initializeSummernotePlugins(controller);
 
-          // Step 3: Merge custom Summernote options (non-callback options)
+          // Step 3: Initialize custom CSS (global before editor init)
+          await _initializeCustomCSS(controller);
+
+          // Step 4: Merge custom Summernote options (non-callback options)
           if (widget.customSummernoteOptions != null) {
             await _injectCustomSummernoteOptions(controller);
           }
 
-          // Step 4: Initialize Summernote
+          // Step 5: Initialize Summernote
           if (widget.useSummernote) {
             await controller.evaluateJavascript(source: 'RE.initSummernote();');
           }
 
-          // Step 5: Apply initial settings and mark as ready
+          // Step 6: Apply initial settings and mark as ready
           _applyInitialSettings();
           widget.controller.setReady(true);
         },
@@ -511,6 +540,51 @@ class _RichEditorState extends State<RichEditor> {
     }
   }
 
+  /// Initialize all custom CSS before/after editor initialization.
+  ///
+  /// Global CSS is loaded before editor init, editor-scoped CSS after.
+  Future<void> _initializeCustomCSS(InAppWebViewController controller) async {
+    final globalCSS = widget.customCSS.where((css) => css.scope == CSSScope.global).toList();
+    final editorCSS = widget.customCSS.where((css) => css.scope == CSSScope.editor).toList();
+
+    // Load global CSS first (before editor initialization)
+    for (final css in globalCSS) {
+      await _loadSingleCSS(controller, css);
+    }
+
+    // Store editor-scoped CSS for loading after editor initialization
+    _pendingEditorCSS = editorCSS;
+  }
+
+  /// Load a single CustomCSS configuration.
+  Future<void> _loadSingleCSS(
+    InAppWebViewController controller,
+    CustomCSS css,
+  ) async {
+    try {
+      final scopeStr = css.scope.name;
+
+      if (css.cssContent != null) {
+        final escapedCss = _escapeJavaScript(css.cssContent!);
+        await controller.evaluateJavascript(
+          source: 'RE.injectCustomCSS("${css.cssName}", `$escapedCss`, {scope: "$scopeStr", priority: ${css.priority}});',
+        );
+      } else if (css.assetPath != null) {
+        final assetContent = await rootBundle.loadString(css.assetPath!);
+        final escapedCss = _escapeJavaScript(assetContent);
+        await controller.evaluateJavascript(
+          source: 'RE.injectCustomCSSFromAsset("${css.cssName}", `$escapedCss`, {scope: "$scopeStr", priority: ${css.priority}});',
+        );
+      } else if (css.cssUrl != null) {
+        await controller.evaluateJavascript(
+          source: 'RE.injectCustomCSSFromUrl("${css.cssName}", "${css.cssUrl}", {scope: "$scopeStr", priority: ${css.priority}})',
+        );
+      }
+    } catch (e) {
+      debugPrint('Error loading custom CSS ${css.cssName}: $e');
+    }
+  }
+
   /// Escape a string for safe use in JavaScript.
   String _escapeJavaScript(String input) {
     return input
@@ -563,6 +637,12 @@ class _RichEditorState extends State<RichEditor> {
             'RE.setPadding(\'${widget.padding!.left}px\', \'${widget.padding!.top}px\', \'${widget.padding!.right}px\', \'${widget.padding!.bottom}px\');',
       );
     }
+
+    // Apply custom editor-scoped CSS (after editor initialization)
+    for (final css in _pendingEditorCSS) {
+      await _loadSingleCSS(_webViewController, css);
+    }
+    _pendingEditorCSS = [];
 
     // Set enabled state
     await _webViewController.evaluateJavascript(
