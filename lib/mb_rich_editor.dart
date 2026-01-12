@@ -20,6 +20,9 @@ export 'src/mention/providers/static_mention_provider.dart';
 // Plugin exports
 export 'src/plugin/summernote_plugin.dart';
 
+// Built-in Summernote plugins (ready-to-use)
+export 'src/plugin/built_in/smart_blockquote.dart';
+
 // Deprecated plugin exports (will be removed in v2.0.0)
 // Use SummernotePlugin for native Summernote plugin support instead
 export 'src/plugin/rich_editor_plugin.dart';
