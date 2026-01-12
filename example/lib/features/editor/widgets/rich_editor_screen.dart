@@ -1,6 +1,5 @@
 import 'package:example/features/editor/plugins/smart_blockquote.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:keyboard_detection/keyboard_detection.dart';
 import 'package:mb_rich_editor/mb_rich_editor.dart' as mb;
 import '../../../emoji/sources/json_emoji_source.dart';
@@ -110,15 +109,6 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
         _activeStates.addAll(states);
       });
     };
-  }
-
-  Future<void> _loadInitialHtml() async {
-    try {
-      final htmlContent = await rootBundle.loadString('assets/sample.html');
-      _controller.setHtml(htmlContent);
-    } catch (e) {
-      print('Failed to load initial HTML: $e');
-    }
   }
 
   void _showMentionSuggestions() {

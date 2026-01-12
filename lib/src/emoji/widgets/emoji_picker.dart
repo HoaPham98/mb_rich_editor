@@ -30,7 +30,6 @@ class EmojiPicker extends StatefulWidget {
 class _EmojiPickerState extends State<EmojiPicker> {
   late List<EmojiCategory> _categories;
   String _selectedCategoryId = 'all';
-  String _searchQuery = '';
   List<Emoji> _filteredEmojis = [];
   bool _isLoaded = false;
 
@@ -61,7 +60,6 @@ class _EmojiPickerState extends State<EmojiPicker> {
 
   void _filterEmojis(String query) {
     setState(() {
-      _searchQuery = query;
       if (query.isEmpty) {
         // Show all emojis from selected category
         final selectedCategory = _categories.firstWhere(
@@ -219,7 +217,7 @@ class _EmojiPickerState extends State<EmojiPicker> {
             vertical: 12,
           ),
         ),
-        onChanged: (value) => _filterEmojis(value ?? ''),
+        onChanged: (value) => _filterEmojis(value),
       ),
     );
   }

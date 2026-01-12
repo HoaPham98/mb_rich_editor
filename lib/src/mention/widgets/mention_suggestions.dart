@@ -29,7 +29,6 @@ class MentionSuggestions extends StatefulWidget {
 }
 
 class _MentionSuggestionsState extends State<MentionSuggestions> {
-  String _query = '';
   List<MentionUser> _filteredUsers = [];
   int _selectedIndex = 0;
   bool _isLoading = false;
@@ -44,7 +43,6 @@ class _MentionSuggestionsState extends State<MentionSuggestions> {
 
   void setQuery(String query) async {
     setState(() {
-      _query = query;
       _isLoading = true;
       _selectedIndex = 0;
     });
@@ -92,7 +90,6 @@ class _MentionSuggestionsState extends State<MentionSuggestions> {
 
   void clear() {
     setState(() {
-      _query = '';
       _filteredUsers = [];
       _selectedIndex = 0;
       _isLoading = false;
