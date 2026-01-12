@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'rich_editor_controller.dart';
 import '../mention/models/mention.dart';
+import '../plugin/rich_editor_plugin.dart';
 
 ///
 /// A WebView-based rich text editor for Flutter.
@@ -61,6 +62,14 @@ class RichEditor extends StatefulWidget {
   /// Auto-focus the editor when it's ready
   final bool autoFocus;
 
+  /// Whether to use Summernote editor engine (default: true)
+  /// Set to false to use the legacy rich_editor implementation
+  final bool useSummernote;
+
+  /// Plugins to attach to the editor
+  /// Plugins can inject JavaScript and register handlers
+  final List<RichEditorPlugin> plugins;
+
   const RichEditor({
     super.key,
     required this.controller,
@@ -76,6 +85,8 @@ class RichEditor extends StatefulWidget {
     this.onDecorationChange,
     this.onReady,
     this.autoFocus = false,
+    this.useSummernote = true,
+    this.plugins = const [],
   });
 
   @override
@@ -234,11 +245,15 @@ class _RichEditorState extends State<RichEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final assetPath = widget.useSummernote
+        ? 'packages/mb_rich_editor/assets/summernote/index_summernote.html'
+        : 'packages/mb_rich_editor/assets/rich_editor/index.html';
+
     return SizedBox(
       height: widget.height,
       width: widget.width,
       child: InAppWebView(
-        initialFile: 'packages/mb_rich_editor/assets/rich_editor/index.html',
+        initialFile: assetPath,
         initialSettings: InAppWebViewSettings(
           javaScriptEnabled: true,
           transparentBackground: widget.backgroundColor == null,
@@ -249,8 +264,9 @@ class _RichEditorState extends State<RichEditor> {
           _webViewController = controller;
           widget.controller.registerViewController(controller);
         },
-        onLoadStop: (controller, url) {
+        onLoadStop: (controller, url) async {
           _registerJavaScriptHandlers(controller);
+          await _registerPlugins(controller);
           _applyInitialSettings();
           widget.controller.setReady(true);
         },
@@ -258,6 +274,18 @@ class _RichEditorState extends State<RichEditor> {
             _handleUrlLoading(controller, navigation),
       ),
     );
+  }
+
+  /// Register all plugins with the WebView
+  Future<void> _registerPlugins(InAppWebViewController controller) async {
+    for (final plugin in widget.plugins) {
+      // Attach plugin to controller
+      plugin.onAttach(widget.controller);
+      // Register handlers
+      plugin.registerHandlers(controller);
+      // Inject JavaScript
+      await plugin.injectJavaScript(controller);
+    }
   }
 
   Future<void> _applyInitialSettings() async {

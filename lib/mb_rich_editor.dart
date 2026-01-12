@@ -16,3 +16,7 @@ export 'src/mention/models/mention_provider.dart';
 export 'src/mention/config/mention_config.dart';
 export 'src/mention/widgets/mention_suggestions.dart';
 export 'src/mention/providers/static_mention_provider.dart';
+
+export 'src/plugin/rich_editor_plugin.dart';
+export 'src/plugin/mention_plugin.dart';
+export 'src/plugin/emoji_plugin.dart';

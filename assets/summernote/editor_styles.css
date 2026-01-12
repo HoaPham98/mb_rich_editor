@@ -1,0 +1,94 @@
+/* Custom styles for Summernote editor in Flutter WebView */
+
+/* Hide Summernote's default toolbar - we use Flutter toolbar */
+.note-toolbar {
+  display: none !important;
+}
+
+/* Hide status bar */
+.note-statusbar {
+  display: none !important;
+}
+
+/* Remove default frame/borders from Summernote */
+.note-editor.note-frame {
+  border: none !important;
+}
+
+/* Make editor fill the container */
+.note-editor {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/* Style the editable area */
+.note-editable {
+  background-color: transparent;
+  padding: 16px;
+  min-height: 100%;
+  outline: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #000;
+  word-wrap: break-word;
+}
+
+/* Placeholder styling */
+.note-placeholder {
+  color: #999;
+  padding: 16px;
+}
+
+/* Dark mode support - will be toggled via JS */
+.dark-mode .note-editable {
+  color: #fff;
+  background-color: transparent;
+}
+
+.dark-mode .note-placeholder {
+  color: #666;
+}
+
+/* Reset body margins */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: transparent;
+}
+
+/* Mention styling */
+.mention {
+  color: #0066cc;
+  text-decoration: none;
+  background-color: rgba(0, 102, 204, 0.1);
+  border-radius: 3px;
+  padding: 1px 3px;
+}
+
+/* Emoji styling */
+.emoji {
+  display: inline;
+  vertical-align: middle;
+  height: 1.2em;
+  width: auto;
+}
+
+/* Blockquote styling */
+blockquote {
+  border-left: 4px solid #ddd;
+  margin: 8px 0;
+  padding-left: 16px;
+  color: #666;
+}
+
+.dark-mode blockquote {
+  border-left-color: #555;
+  color: #aaa;
+}
+
+/* Image styling */
+img:not(.emoji) {
+  max-width: 100%;
+  height: auto;
+}
