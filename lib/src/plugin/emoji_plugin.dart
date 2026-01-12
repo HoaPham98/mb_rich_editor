@@ -11,19 +11,25 @@ import 'rich_editor_plugin.dart';
 /// - Inserting emoji images at cursor position
 /// - Getting emoji at cursor
 ///
-/// Example usage:
-/// ```dart
-/// final emojiPlugin = EmojiPlugin(
-///   onEmojiSelected: (emoji) {
-///     // Handle emoji selection
-///   },
-/// );
+/// @deprecated Use `SummernotePlugin` with a Summernote-compatible emoji plugin.
+/// This class will be removed in v2.0.0.
 ///
-/// RichEditor(
-///   controller: controller,
-///   plugins: [emojiPlugin],
+/// **Migration Guide:**
+/// ```dart
+/// // OLD (deprecated)
+/// EmojiPlugin(
+///   onEmojiSelected: (emoji) { ... },
+/// )
+///
+/// // NEW (recommended)
+/// SummernotePlugin.fromUrl(
+///   'emoji',
+///   'https://cdn.jsdelivr.net/npm/summernote-emoji/dist/summernote-emoji.min.js',
+///   options: {'emojiPath': '/assets/emoji/'},
+///   callbacks: {'onEmojiSelect': (emoji) { ... }},
 /// )
 /// ```
+@Deprecated('Use SummernotePlugin with a Summernote-compatible emoji plugin instead. Will be removed in v2.0.0.')
 class EmojiPlugin extends RichEditorPlugin {
   /// Called when an emoji is selected/clicked.
   final ValueChanged<Emoji?>? onEmojiSelected;

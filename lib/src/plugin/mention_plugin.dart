@@ -13,23 +13,26 @@ import 'rich_editor_plugin.dart';
 /// - Inserting formatted mentions
 /// - Parsing and extracting mentions from content
 ///
-/// Example usage:
-/// ```dart
-/// final mentionPlugin = MentionPlugin(
-///   trigger: '@',
-///   onMentionTrigger: (query) {
-///     // Show mention suggestions for query
-///   },
-///   onMentionHide: () {
-///     // Hide mention suggestions
-///   },
-/// );
+/// @deprecated Use `SummernotePlugin` with a Summernote-compatible mention plugin.
+/// This class will be removed in v2.0.0.
 ///
-/// RichEditor(
-///   controller: controller,
-///   plugins: [mentionPlugin],
+/// **Migration Guide:**
+/// ```dart
+/// // OLD (deprecated)
+/// MentionPlugin(
+///   trigger: '@',
+///   onMentionTrigger: (query) { ... },
+/// )
+///
+/// // NEW (recommended)
+/// SummernotePlugin.fromAsset(
+///   'mention',
+///   'assets/summernote_plugins/mention/summernote-mention.js',
+///   options: {'trigger': '@'},
+///   callbacks: {'onSearch': (query) { ... }},
 /// )
 /// ```
+@Deprecated('Use SummernotePlugin with a Summernote-compatible mention plugin instead. Will be removed in v2.0.0.')
 class MentionPlugin extends RichEditorPlugin {
   /// The trigger character for mentions (default: '@')
   final String trigger;

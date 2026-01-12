@@ -1,12 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'rich_editor_controller.dart';
 import '../mention/models/mention.dart';
 import '../models/summernote_callbacks.dart';
-import '../plugin/rich_editor_plugin.dart';
+import '../plugin/summernote_plugin.dart';
 
 ///
 /// A WebView-based rich text editor for Flutter.
@@ -67,9 +68,25 @@ class RichEditor extends StatefulWidget {
   /// Set to false to use the legacy rich_editor implementation
   final bool useSummernote;
 
-  /// Plugins to attach to the editor
-  /// Plugins can inject JavaScript and register handlers
-  final List<RichEditorPlugin> plugins;
+  /// Summernote plugins to attach to the editor.
+  ///
+  /// Plugins can be loaded from:
+  /// - CDN URLs (via `SummernotePlugin.fromUrl`)
+  /// - Flutter asset bundles (via `SummernotePlugin.fromAsset`)
+  /// - Raw JavaScript strings (via `SummernotePlugin.fromCode`)
+  ///
+  /// Example:
+  /// ```dart
+  /// plugins: [
+  ///   SummernotePlugin.fromUrl(
+  ///     'emoji',
+  ///     'https://cdn.jsdelivr.net/npm/summernote-emoji/dist/plugin.min.js',
+  ///     options: {'emojiPath': '/assets/emoji/'},
+  ///     callbacks: {'onSelect': (emoji) => print('Emoji: $emoji')},
+  ///   ),
+  /// ]
+  /// ```
+  final List<SummernotePlugin> plugins;
 
   /// Custom Summernote options to inject at initialization.
   /// Use this for non-callback options like height, toolbar, styling, etc.
@@ -299,22 +316,25 @@ class _RichEditorState extends State<RichEditor> {
         onLoadStop: (controller, url) async {
           _registerJavaScriptHandlers(controller);
 
-          // IMPORTANT: Register Summernote callback handlers BEFORE initialization
+          // Step 1: Register Summernote callback handlers BEFORE initialization
           if (widget.summernoteCallbacks != null) {
             await _registerSummernoteCallbackHandlers(controller);
           }
 
-          // Inject custom options (non-callback options)
+          // Step 2: Initialize Summernote plugins (load scripts, configure options)
+          await _initializeSummernotePlugins(controller);
+
+          // Step 3: Merge custom Summernote options (non-callback options)
           if (widget.customSummernoteOptions != null) {
             await _injectCustomSummernoteOptions(controller);
           }
 
-          // Trigger Summernote initialization
+          // Step 4: Initialize Summernote
           if (widget.useSummernote) {
             await controller.evaluateJavascript(source: 'RE.initSummernote();');
           }
 
-          await _registerPlugins(controller);
+          // Step 5: Apply initial settings and mark as ready
           _applyInitialSettings();
           widget.controller.setReady(true);
         },
@@ -421,16 +441,83 @@ class _RichEditorState extends State<RichEditor> {
     }
   }
 
-  /// Register all plugins with the WebView
-  Future<void> _registerPlugins(InAppWebViewController controller) async {
+  /// Initialize all Summernote plugins before editor initialization.
+  ///
+  /// This method:
+  /// 1. Registers Dart handlers for plugin callbacks
+  /// 2. Loads plugin scripts from URL, asset, or raw code
+  /// 3. Configures plugin options and language strings
+  Future<void> _initializeSummernotePlugins(
+      InAppWebViewController controller) async {
     for (final plugin in widget.plugins) {
-      // Attach plugin to controller
-      plugin.onAttach(widget.controller);
-      // Register handlers
-      plugin.registerHandlers(controller);
-      // Inject JavaScript
-      await plugin.injectJavaScript(controller);
+      // Step 1: Register Dart handlers for plugin callbacks
+      if (plugin.callbacks != null) {
+        plugin.callbacks!.forEach((callbackName, _) {
+          final handlerName = 'plugin_${plugin.pluginName}_$callbackName';
+          controller.addJavaScriptHandler(
+            handlerName: handlerName,
+            callback: (args) {
+              final data = args.isNotEmpty ? args[0] : null;
+              plugin.callbacks![callbackName]?.call(data);
+            },
+          );
+        });
+      }
+
+      // Step 2: Load plugin script
+      if (plugin.scriptUrl != null) {
+        await controller.evaluateJavascript(
+          source:
+              'RE.loadSummernotePluginFromUrl("${plugin.pluginName}", "${plugin.scriptUrl}")',
+        );
+      } else if (plugin.assetPath != null) {
+        final assetContent = await rootBundle.loadString(plugin.assetPath!);
+        final escapedContent = _escapeJavaScript(assetContent);
+        await controller.evaluateJavascript(
+          source:
+              'RE.loadSummernotePluginFromAsset("${plugin.pluginName}", `$escapedContent`)',
+        );
+      } else if (plugin.rawJavaScript != null) {
+        final escapedCode = _escapeJavaScript(plugin.rawJavaScript!);
+        await controller.evaluateJavascript(
+          source:
+              'RE.loadSummernotePluginFromCode("${plugin.pluginName}", `$escapedCode`)',
+        );
+      }
+
+      // Step 3: Configure plugin options
+      if (plugin.options.isNotEmpty) {
+        final optionsJson = jsonEncode(plugin.options);
+        await controller.evaluateJavascript(
+          source:
+              'RE.configureSummernotePlugin("${plugin.pluginName}", $optionsJson)',
+        );
+      }
+
+      // Step 4: Configure language strings
+      if (plugin.language != null) {
+        plugin.language!.forEach((langCode, strings) {
+          final stringsJson = jsonEncode(strings);
+          controller.evaluateJavascript(
+            source:
+                'RE.configureSummernotePluginLang("$langCode", "${plugin.pluginName}", $stringsJson)',
+          );
+        });
+      }
     }
+  }
+
+  /// Escape a string for safe use in JavaScript.
+  String _escapeJavaScript(String input) {
+    return input
+        .replaceAll('\\', '\\\\')
+        .replaceAll("'", "\\'")
+        .replaceAll('"', '\\"')
+        .replaceAll('\n', '\\n')
+        .replaceAll('\r', '\\r')
+        .replaceAll('\t', '\\t')
+        .replaceAll('\$', '\\\$')
+        .replaceAll('/', '\\/');
   }
 
   Future<void> _applyInitialSettings() async {

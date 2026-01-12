@@ -1,3 +1,4 @@
+import 'package:example/features/editor/plugins/smart_blockquote.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:keyboard_detection/keyboard_detection.dart';
@@ -193,12 +194,13 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
                           controller: _controller,
                           placeholder: 'Start typing...',
                           customSummernoteOptions: {
-                            'blockquoteBreakingLevel': 1,
+                            'blockquoteBreakingLevel': 0,
                           },
                           padding: const EdgeInsets.all(16.0),
                           onTextChange: (html) {
                             _currentHtml = html;
                           },
+                          plugins: [smartBlockquote],
                         ),
                       ),
                       Positioned(

@@ -17,6 +17,11 @@ export 'src/mention/config/mention_config.dart';
 export 'src/mention/widgets/mention_suggestions.dart';
 export 'src/mention/providers/static_mention_provider.dart';
 
+// Plugin exports
+export 'src/plugin/summernote_plugin.dart';
+
+// Deprecated plugin exports (will be removed in v2.0.0)
+// Use SummernotePlugin for native Summernote plugin support instead
 export 'src/plugin/rich_editor_plugin.dart';
 export 'src/plugin/mention_plugin.dart';
 export 'src/plugin/emoji_plugin.dart';

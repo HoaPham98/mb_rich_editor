@@ -8,26 +8,47 @@ import '../core/rich_editor_controller.dart';
 /// This allows for extensible functionality like mentions and emojis without
 /// modifying the core editor code.
 ///
+/// @deprecated Use `SummernotePlugin` for native Summernote plugin support.
+/// This class will be removed in v2.0.0.
+///
+/// **Migration Guide:**
+/// - Replace `RichEditorPlugin` with `SummernotePlugin`
+/// - Rewrite plugins as Summernote-compatible jQuery plugins
+/// - Use `$.summernote.plugins` API instead of extending `RE` object
+/// - Register buttons via `context.memo('button.pluginName')`
+/// - Bridge callbacks using `window.flutter_inappwebview.callHandler()`
+///
 /// Example usage:
 /// ```dart
+/// // OLD (deprecated)
 /// class MyPlugin extends RichEditorPlugin {
 ///   @override
 ///   String get id => 'my_plugin';
-///
 ///   @override
 ///   String get javascriptToInject => '''
 ///     RE.myCustomMethod = function() { ... };
 ///   ''';
-///
 ///   @override
 ///   List<String> get handlerNames => ['myHandler'];
-///
 ///   @override
-///   void onHandlerCalled(String handlerName, dynamic args) {
-///     // Handle callback from JS
-///   }
+///   void onHandlerCalled(String handlerName, dynamic args) { ... }
 /// }
+///
+/// // NEW (recommended)
+/// final myPlugin = SummernotePlugin.fromCode(
+///   'myPlugin',
+///   '''
+///     (function(factory) { factory(jQuery); }(function($) {
+///       $.extend($.summernote.plugins, {
+///         'myPlugin': function(context) {
+///           context.memo('button.myPlugin', function() { ... });
+///         }
+///       });
+///     }));
+///   ''',
+/// );
 /// ```
+@Deprecated('Use SummernotePlugin instead. Will be removed in v2.0.0.')
 abstract class RichEditorPlugin {
   RichEditorController? _controller;
 
