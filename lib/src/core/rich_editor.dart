@@ -346,7 +346,8 @@ class _RichEditorState extends State<RichEditor> {
 
   /// Register JavaScript handlers for Summernote callbacks
   Future<void> _registerSummernoteCallbackHandlers(
-      InAppWebViewController controller) async {
+    InAppWebViewController controller,
+  ) async {
     final callbacks = widget.summernoteCallbacks!;
     final callbackNames = callbacks.providedCallbackNames;
 
@@ -363,7 +364,8 @@ class _RichEditorState extends State<RichEditor> {
 
     // Notify JS which callbacks are available
     await controller.evaluateJavascript(
-      source: 'window.availableSummernoteCallbacks = ${jsonEncode(callbackNames)};',
+      source:
+          'window.availableSummernoteCallbacks = ${jsonEncode(callbackNames)};',
     );
   }
 
@@ -428,7 +430,8 @@ class _RichEditorState extends State<RichEditor> {
 
   /// Inject custom Summernote options before initialization
   Future<void> _injectCustomSummernoteOptions(
-      InAppWebViewController controller) async {
+    InAppWebViewController controller,
+  ) async {
     if (widget.customSummernoteOptions == null) return;
 
     try {
@@ -448,7 +451,8 @@ class _RichEditorState extends State<RichEditor> {
   /// 2. Loads plugin scripts from URL, asset, or raw code
   /// 3. Configures plugin options and language strings
   Future<void> _initializeSummernotePlugins(
-      InAppWebViewController controller) async {
+    InAppWebViewController controller,
+  ) async {
     for (final plugin in widget.plugins) {
       // Step 1: Register Dart handlers for plugin callbacks
       if (plugin.callbacks != null) {

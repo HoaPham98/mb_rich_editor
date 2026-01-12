@@ -210,7 +210,7 @@ function initSummernote() {
 }
 
 // Manual initialization trigger (called from Dart)
-RE.initSummernote = function() {
+RE.initSummernote = function () {
   initSummernote();
 };
 
@@ -570,6 +570,24 @@ RE.enabledEditingItems = function () {
     items.push(formatBlock);
   }
 
+  // Check if cursor is inside a blockquote
+  var selection = window.getSelection();
+  if (selection.rangeCount > 0) {
+    var range = selection.getRangeAt(0);
+    var node = range.startContainer;
+
+    // If cursor is in a text node, get its parent element
+    if (node.nodeType === 3) {
+      node = node.parentElement;
+    }
+
+    // Check if the cursor or any of its ancestors is a blockquote
+    var blockquote = node.closest('blockquote');
+    if (blockquote) {
+      items.push('blockquote');
+    }
+  }
+
   const stateString = items.join(',');
 
   // Original callback for backward compatibility
@@ -600,7 +618,8 @@ RE.enabledEditingItems = function () {
   stateMap['justifyCenter'] = items.includes('justifyCenter');
   stateMap['justifyRight'] = items.includes('justifyRight');
   stateMap['justifyFull'] = items.includes('justifyFull');
-  stateMap['formatBlock'] = formatBlock || ''; // NEW: Include format block
+  stateMap['blockquote'] = items.includes('blockquote');
+  stateMap['formatBlock'] = formatBlock || ''; // Include format block
 
   // Check if state changed
   let stateChanged = false;
@@ -710,7 +729,7 @@ RE.loadedPlugins = new Set();
  * @param {string} scriptUrl - The CDN URL to load the plugin from
  * @returns {Promise} Resolves when loaded, rejects on error
  */
-RE.loadSummernotePluginFromUrl = function(pluginName, scriptUrl) {
+RE.loadSummernotePluginFromUrl = function (pluginName, scriptUrl) {
   return new Promise((resolve, reject) => {
     // Check if already loaded
     if (RE.loadedPlugins.has(scriptUrl)) {
@@ -737,7 +756,7 @@ RE.loadSummernotePluginFromUrl = function(pluginName, scriptUrl) {
  * @param {string} assetContent - The JavaScript content from the asset
  * @returns {Promise} Resolves when loaded, rejects on error
  */
-RE.loadSummernotePluginFromAsset = function(pluginName, assetContent) {
+RE.loadSummernotePluginFromAsset = function (pluginName, assetContent) {
   return new Promise((resolve, reject) => {
     try {
       const script = document.createElement('script');
@@ -757,7 +776,7 @@ RE.loadSummernotePluginFromAsset = function(pluginName, assetContent) {
  * @param {string} jsCode - The JavaScript code to inject
  * @returns {Promise} Resolves when loaded, rejects on error
  */
-RE.loadSummernotePluginFromCode = function(pluginName, jsCode) {
+RE.loadSummernotePluginFromCode = function (pluginName, jsCode) {
   return new Promise((resolve, reject) => {
     try {
       const script = document.createElement('script');
@@ -777,7 +796,7 @@ RE.loadSummernotePluginFromCode = function(pluginName, jsCode) {
  * @param {string} pluginName - The name of the plugin
  * @param {Object} options - The options to configure
  */
-RE.configureSummernotePlugin = function(pluginName, options) {
+RE.configureSummernotePlugin = function (pluginName, options) {
   if (!$.summernote.options) $.summernote.options = {};
   $.summernote.options[pluginName] = options;
   console.log('Summernote plugin options configured:', pluginName, options);
@@ -790,7 +809,7 @@ RE.configureSummernotePlugin = function(pluginName, options) {
  * @param {string} pluginName - The name of the plugin
  * @param {Object} strings - The language strings to configure
  */
-RE.configureSummernotePluginLang = function(langCode, pluginName, strings) {
+RE.configureSummernotePluginLang = function (langCode, pluginName, strings) {
   if (!$.summernote.lang) $.summernote.lang = {};
   if (!$.summernote.lang[langCode]) $.summernote.lang[langCode] = {};
   $.summernote.lang[langCode][pluginName] = strings;
@@ -804,8 +823,8 @@ RE.configureSummernotePluginLang = function(langCode, pluginName, strings) {
  * @param {string} callbackName - The name of the callback
  * @returns {Function} A function that calls the Dart handler
  */
-RE.registerPluginCallback = function(pluginName, callbackName) {
-  return function(data) {
+RE.registerPluginCallback = function (pluginName, callbackName) {
+  return function (data) {
     if (window.flutter_inappwebview) {
       window.flutter_inappwebview.callHandler('plugin_' + pluginName + '_' + callbackName, data);
     }
