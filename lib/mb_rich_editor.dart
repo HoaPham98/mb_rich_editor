@@ -16,3 +16,6 @@ export 'src/plugin/summernote_plugin.dart';
 // Built-in Summernote plugins (ready-to-use)
 export 'src/plugin/built_in/smart_blockquote.dart';
 export 'src/plugin/mention_plugin.dart';
+
+// Css
+export 'src/css/custom_css.dart';
