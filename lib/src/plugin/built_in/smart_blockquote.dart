@@ -21,7 +21,7 @@ import '../summernote_plugin.dart';
 /// RichEditor(
 ///   controller: controller,
 ///   plugins: [
-///     smartBlockquote,
+///     SmartBlockquotePlugin(),
 ///   ],
 /// )
 /// ```
@@ -34,9 +34,9 @@ import '../summernote_plugin.dart';
 /// - Empty line detection checks for no text and no inline/block elements
 ///
 /// **Note:** This plugin uses the plugin name `'smartBlockquoteExit'` internally.
-final SummernotePlugin smartBlockquote = SummernotePlugin.fromCode(
-  'smartBlockquoteExit',
-  r'''
+class SmartBlockquotePlugin extends SummernotePlugin {
+  /// The embedded JavaScript code for the smart blockquote plugin
+  static const String _javascriptCode = r'''
     (function (factory) {
     if (typeof define === 'function' && define.amd) {
         define(['jquery'], factory);
@@ -109,6 +109,31 @@ final SummernotePlugin smartBlockquote = SummernotePlugin.fromCode(
         }
     });
 }));
-  ''',
-  options: const {},
-);
+  ''';
+
+  /// Creates a smart blockquote plugin with embedded JavaScript.
+  ///
+  /// This plugin automatically handles Enter key behavior inside blockquotes
+  /// - Press Enter on empty line → exit blockquote
+  /// - Press Enter on non-empty line → create new line inside
+  const SmartBlockquotePlugin() : super(
+        pluginName: 'smartBlockquoteExit',
+        rawJavaScript: _javascriptCode,
+        options: const {},
+      );
+}
+
+/// Backwards compatibility: export as a final instance for existing code.
+///
+/// **Deprecated:** Use `SmartBlockquotePlugin()` constructor instead.
+/// This instance is kept for backwards compatibility.
+///
+/// ```dart
+/// // Old way (still works but deprecated):
+/// plugins: [smartBlockquote]
+///
+/// // New way (recommended):
+/// plugins: [SmartBlockquotePlugin()]
+/// ```
+@Deprecated('Use SmartBlockquotePlugin() constructor instead')
+final SummernotePlugin smartBlockquote = SmartBlockquotePlugin();

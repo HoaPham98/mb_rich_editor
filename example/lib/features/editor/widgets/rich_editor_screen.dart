@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:example/features/editor/plugins/smart_blockquote.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_detection/keyboard_detection.dart';
 import 'package:mb_rich_editor/mb_rich_editor.dart' as mb;
@@ -40,7 +39,6 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
   ];
 
   // Visual state
-  bool _isBottomSheetOpen = false;
   bool _isMentionSheetOpen = false;
   String _currentHtml = '';
   // ignore: unused_field
@@ -134,10 +132,7 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
 
   /// Inserts a mention into the editor
   void _insertMention(mb.MentionUser user) {
-    final mentionData = jsonEncode({
-      'user': user.toJson(),
-      'trigger': '@',
-    });
+    final mentionData = jsonEncode({'user': user.toJson(), 'trigger': '@'});
     _controller.evalJs('RE.insertMentionFromDart($mentionData);');
   }
 
@@ -209,7 +204,7 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
                           onTextChange: (html) {
                             _currentHtml = html;
                           },
-                          plugins: [smartBlockquote, _createMentionPlugin()],
+                          plugins: [mb.SmartBlockquotePlugin(), _createMentionPlugin()],
                         ),
                       ),
                       Positioned(
