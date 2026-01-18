@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-01-18
+### Added
+- Mention plugin with @-trigger detection and user picker
+- SmartBlockquotePlugin class-based structure
+- MentionUser model for user mentions
+### Changed
+- Renamed RichEditor classes to MB prefix (MBRichEditorController, MBRichEditor)
+- Consolidated mention logic into MentionPlugin class
+- Improved code quality with const modifiers and super parameters
+### Removed
+- Unused mention classes consolidated into plugin
+- Deprecated plugins (emoji, mention, rich_editor_plugin)
+
 ## [1.1.0] - 2026-01-12
 ### Added
 - Custom CSS styles support
