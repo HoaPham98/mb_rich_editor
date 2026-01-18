@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mb_rich_editor/mb_rich_editor.dart';
 
 class EditorToolbar extends StatelessWidget {
-  final RichEditorController controller;
+  final MBRichEditorController controller;
   final VoidCallback onEmojiPicker;
 
   const EditorToolbar({

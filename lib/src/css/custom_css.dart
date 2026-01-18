@@ -138,40 +138,25 @@ class _CustomCSSFromString extends CustomCSS {
   const _CustomCSSFromString(
     String cssName,
     String cssContent, {
-    CSSScope scope = CSSScope.editor,
-    int priority = 100,
-  }) : super(
-          cssName: cssName,
-          cssContent: cssContent,
-          scope: scope,
-          priority: priority,
-        );
+    super.scope = CSSScope.editor,
+    super.priority = 100,
+  }) : super(cssName: cssName, cssContent: cssContent);
 }
 
 class _CustomCSSFromAsset extends CustomCSS {
   const _CustomCSSFromAsset(
     String cssName,
     String assetPath, {
-    CSSScope scope = CSSScope.editor,
-    int priority = 100,
-  }) : super(
-          cssName: cssName,
-          assetPath: assetPath,
-          scope: scope,
-          priority: priority,
-        );
+    super.scope = CSSScope.editor,
+    super.priority = 100,
+  }) : super(cssName: cssName, assetPath: assetPath);
 }
 
 class _CustomCSSFromUrl extends CustomCSS {
   const _CustomCSSFromUrl(
     String cssName,
     String cssUrl, {
-    CSSScope scope = CSSScope.editor,
-    int priority = 100,
-  }) : super(
-          cssName: cssName,
-          cssUrl: cssUrl,
-          scope: scope,
-          priority: priority,
-        );
+    super.scope = CSSScope.editor,
+    super.priority = 100,
+  }) : super(cssName: cssName, cssUrl: cssUrl);
 }

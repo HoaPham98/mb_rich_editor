@@ -13,7 +13,7 @@ class EmojiPicker extends StatefulWidget {
   final Widget Function(BuildContext, EmojiCategory)? categoryBuilder;
   final Widget Function(BuildContext, Emoji)? emojiBuilder;
 
-  EmojiPicker({
+  const EmojiPicker({
     super.key,
     required this.emojiSource,
     this.config = EmojiPickerConfig.defaultConfig,

@@ -40,7 +40,7 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
   bool _isMentionSheetOpen = false;
   String _currentHtml = '';
   // ignore: unused_field
-  List<String> _activeStates = [];
+  final List<String> _activeStates = [];
   bool _useBuiltInToolbar = false;
 
   @override
