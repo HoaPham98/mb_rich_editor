@@ -5,8 +5,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../css/custom_css.dart';
 import '../emoji/models/emoji.dart';
-import '../mention/models/mention.dart';
-import '../mention/models/mention_user.dart';
 
 ///
 /// Controller for the RichEditor widget.
@@ -18,9 +16,6 @@ class RichEditorController extends ChangeNotifier {
   String _html = '';
   final List<String> _activeStates = [];
   Emoji? _currentEmoji;
-  Mention? _currentMention;
-  String? _mentionTextAtCursor;
-  List<Mention> _allMentions = [];
 
   /// Callback when text changes
   ValueChanged<String>? onTextChange;
@@ -33,15 +28,6 @@ class RichEditorController extends ChangeNotifier {
 
   /// Callback when emoji is selected from picker
   ValueChanged<Emoji?>? onEmojiSelected;
-
-  /// Callback when mention trigger is detected
-  ValueChanged<String?>? onMentionTrigger;
-
-  /// Callback when mention bottom sheet should be hidden
-  VoidCallback? onMentionHide;
-
-  /// Callback when mention is selected
-  ValueChanged<String?>? onMentionSelected;
 
   /// Register the WebView controller
   void registerViewController(InAppWebViewController controller) {
@@ -339,94 +325,6 @@ class RichEditorController extends ChangeNotifier {
   void setCurrentEmoji(Emoji? emoji) {
     _currentEmoji = emoji;
     onEmojiSelected?.call(emoji);
-  }
-
-  // ==================== Mention Methods ====================
-
-  /// Insert mention at cursor position
-  Future<void> insertMention(Mention mention) async {
-    final mentionJson = jsonEncode(mention.toJson());
-    await _evalJs('RE.insertMention($mentionJson);');
-  }
-
-  /// Get mention at cursor position
-  Future<Mention?> getMentionAtCursor() async {
-    await _evalJs(
-      'window.getMentionAtCursor.postMessage(RE.getMentionAtCursor());',
-    );
-    await Future.delayed(const Duration(milliseconds: 100));
-    return _currentMention;
-  }
-
-  /// Get all mentions in the editor
-  Future<List<Mention>> getAllMentions() async {
-    await _evalJs('window.getAllMentions.postMessage(RE.getAllMentions());');
-    await Future.delayed(const Duration(milliseconds: 100));
-    return _allMentions;
-  }
-
-  /// Remove mention by user ID
-  Future<void> removeMention(String userId) async {
-    await _evalJs('RE.removeMention(\'$userId\');');
-  }
-
-  /// Update mention by user ID
-  Future<void> updateMention(String userId, Mention newMention) async {
-    final mentionJson = jsonEncode(newMention.toJson());
-    await _evalJs('RE.updateMention(\'$userId\', $mentionJson);');
-  }
-
-  /// Get mention text at cursor (e.g., "@username")
-  Future<String?> getMentionTextAtCursor() async {
-    await _evalJs(
-      'window.getMentionTextAtCursor.postMessage(RE.getMentionTextAtCursor());',
-    );
-    await Future.delayed(const Duration(milliseconds: 100));
-    return _mentionTextAtCursor;
-  }
-
-  /// Set current mention (internal use)
-  void setCurrentMention(Mention? mention) {
-    _currentMention = mention;
-    onMentionSelected?.call(mention?.user.username);
-  }
-
-  /// Set mention text at cursor (internal use)
-  void setMentionTextAtCursor(String? text) {
-    _mentionTextAtCursor = text;
-    onMentionTrigger?.call(text ?? '');
-  }
-
-  /// Hide mention bottom sheet (called from JavaScript)
-  void hideMentionBottomSheet() {
-    onMentionHide?.call();
-  }
-
-  /// Set all mentions (internal use)
-  void setAllMentions(List<Mention> mentions) {
-    _allMentions = mentions;
-  }
-
-  /// Insert a mention at the current cursor position (convenience method)
-  ///
-  /// This is a convenience method that creates a Mention object from a MentionUser
-  /// and inserts it. For more control, create the Mention object yourself.
-  ///
-  /// Example:
-  /// ```dart
-  /// final user = MentionUser(
-  ///   id: '123',
-  ///   username: 'john_doe',
-  ///   displayName: 'John Doe',
-  /// );
-  /// await controller.insertMentionFromUser(user);
-  /// ```
-  Future<void> insertMentionFromUser(MentionUser user) async {
-    final mention = Mention.link(
-      user: user,
-      trigger: '@',
-    );
-    await insertMention(mention);
   }
 
   // ==================== Editor Control ====================

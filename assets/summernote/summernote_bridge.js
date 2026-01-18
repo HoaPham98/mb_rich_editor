@@ -669,51 +669,6 @@ RE.scrollToCursor = function () {
   }
 };
 
-// ==================== Mention Support (Plugin Interface) ====================
-
-// These will be overridden by the MentionPlugin when loaded
-RE.insertMention = function (mentionData) {
-  console.log('MentionPlugin not loaded');
-};
-
-RE.getMentionAtCursor = function () {
-  return null;
-};
-
-RE.getAllMentions = function () {
-  return [];
-};
-
-RE.detectMentionTrigger = function (text, position, trigger) {
-  return null;
-};
-
-RE.getTextAroundCursor = function (lookBack) {
-  lookBack = lookBack || 50;
-  var selection = window.getSelection();
-  if (!selection.rangeCount) return '';
-
-  var textContent = $(RE.editor).text();
-  var cursorPosition = getCaretCharacterOffset(RE.editor);
-  var start = Math.max(0, cursorPosition - lookBack);
-  return textContent.substring(start, cursorPosition);
-};
-
-RE.isCursorInsideMention = function () {
-  return false;
-};
-
-function getCaretCharacterOffset(element) {
-  var selection = window.getSelection();
-  if (selection.rangeCount === 0) return 0;
-
-  var range = selection.getRangeAt(0).cloneRange();
-  range.selectNodeContents(element);
-  range.setEnd(selection.getRangeAt(0).endContainer, selection.getRangeAt(0).endOffset);
-
-  return range.toString().length;
-}
-
 // Export RE globally
 window.RE = RE;
 

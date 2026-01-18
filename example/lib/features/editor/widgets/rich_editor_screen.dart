@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:keyboard_detection/keyboard_detection.dart';
 import 'package:mb_rich_editor/mb_rich_editor.dart' as mb;
@@ -132,8 +130,7 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
 
   /// Inserts a mention into the editor
   void _insertMention(mb.MentionUser user) {
-    final mentionData = jsonEncode({'user': user.toJson(), 'trigger': '@'});
-    _controller.evalJs('RE.insertMentionFromDart($mentionData);');
+    mb.MentionPlugin.insertMention(_controller, user);
   }
 
   void _onEmojiButtonTapped() {

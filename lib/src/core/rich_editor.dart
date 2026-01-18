@@ -6,7 +6,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'rich_editor_controller.dart';
 import '../css/custom_css.dart';
-import '../mention/models/mention.dart';
 import '../models/summernote_callbacks.dart';
 import '../plugin/summernote_plugin.dart';
 
@@ -218,58 +217,6 @@ class _RichEditorState extends State<RichEditor> {
       callback: (args) {
         if (args.isNotEmpty) {
           widget.controller.setHtmlResult(args[0].toString());
-        }
-      },
-    );
-
-    controller.addJavaScriptHandler(
-      handlerName: 'getMentionAtCursor',
-      callback: (args) {
-        if (args.isNotEmpty) {
-          debugPrint('DEBUG: getMentionAtCursor received: ${args[0]}');
-          try {
-            final mentionData = jsonDecode(args[0].toString());
-            final mention = Mention.fromJson(mentionData);
-            widget.controller.setCurrentMention(mention);
-          } catch (e) {
-            debugPrint('DEBUG: Error parsing mention: $e');
-          }
-        }
-      },
-    );
-
-    controller.addJavaScriptHandler(
-      handlerName: 'getMentionTextAtCursor',
-      callback: (args) {
-        if (args.isNotEmpty) {
-          debugPrint('DEBUG: getMentionTextAtCursor received: ${args[0]}');
-          widget.controller.setMentionTextAtCursor(args[0].toString());
-        }
-      },
-    );
-
-    controller.addJavaScriptHandler(
-      handlerName: 'hideMentionBottomSheet',
-      callback: (args) {
-        debugPrint('DEBUG: hideMentionBottomSheet called');
-        widget.controller.hideMentionBottomSheet();
-      },
-    );
-
-    controller.addJavaScriptHandler(
-      handlerName: 'getAllMentions',
-      callback: (args) {
-        if (args.isNotEmpty) {
-          debugPrint('DEBUG: getAllMentions received: ${args[0]}');
-          try {
-            final List<dynamic> mentionsData = jsonDecode(args[0].toString());
-            final mentions = mentionsData
-                .map((data) => Mention.fromJson(data))
-                .toList();
-            widget.controller.setAllMentions(mentions);
-          } catch (e) {
-            debugPrint('DEBUG: Error parsing mentions: $e');
-          }
         }
       },
     );

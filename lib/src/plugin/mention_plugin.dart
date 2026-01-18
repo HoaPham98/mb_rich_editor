@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import '../mention/models/mention_user.dart';
+import '../core/rich_editor_controller.dart';
 import 'summernote_plugin.dart';
 
 /// Mention plugin for the rich editor.
 ///
 /// This plugin uses a Summernote mention plugin to detect @ trigger
-/// and notify Dart via callback. The user then shows their UI and
-/// calls [RichEditorController.insertMention] when user selects.
+/// and notify Dart via callback. Use the static [insertMention] method
+/// to insert a mention when the user selects one.
 ///
 /// Example usage:
 /// ```dart
@@ -17,6 +21,9 @@ import 'summernote_plugin.dart';
 ///     ),
 ///   ],
 /// )
+///
+/// // When user selects a mention:
+/// MentionPlugin.insertMention(_controller, selectedUser);
 /// ```
 class MentionPlugin extends SummernotePlugin {
   /// The embedded JavaScript code for the mention plugin
@@ -247,4 +254,27 @@ RE.insertMentionFromDart = function(mentionData) {
           if (onMentionHide != null) 'onMentionHide': (_) => onMentionHide(),
         },
       );
+
+  /// Insert a mention into the editor at the current cursor position.
+  ///
+  /// This method calls the JavaScript function `RE.insertMentionFromDart`
+  /// which is provided by the mention plugin. The mention will replace
+  /// the @query text that triggered the mention picker.
+  ///
+  /// Example:
+  /// ```dart
+  /// // When user selects a user from the picker:
+  /// MentionPlugin.insertMention(_controller, selectedUser);
+  /// ```
+  static Future<void> insertMention(
+    RichEditorController controller,
+    MentionUser user, {
+    String trigger = '@',
+  }) async {
+    final mentionData = jsonEncode({
+      'user': user.toJson(),
+      'trigger': trigger,
+    });
+    await controller.evalJs('RE.insertMentionFromDart($mentionData);');
+  }
 }
