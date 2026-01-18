@@ -6,6 +6,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import '../css/custom_css.dart';
 import '../emoji/models/emoji.dart';
 import '../mention/models/mention.dart';
+import '../mention/models/mention_user.dart';
 
 ///
 /// Controller for the RichEditor widget.
@@ -406,6 +407,28 @@ class RichEditorController extends ChangeNotifier {
     _allMentions = mentions;
   }
 
+  /// Insert a mention at the current cursor position (convenience method)
+  ///
+  /// This is a convenience method that creates a Mention object from a MentionUser
+  /// and inserts it. For more control, create the Mention object yourself.
+  ///
+  /// Example:
+  /// ```dart
+  /// final user = MentionUser(
+  ///   id: '123',
+  ///   username: 'john_doe',
+  ///   displayName: 'John Doe',
+  /// );
+  /// await controller.insertMentionFromUser(user);
+  /// ```
+  Future<void> insertMentionFromUser(MentionUser user) async {
+    final mention = Mention.link(
+      user: user,
+      trigger: '@',
+    );
+    await insertMention(mention);
+  }
+
   // ==================== Editor Control ====================
 
   /// Undo last action
@@ -538,6 +561,21 @@ class RichEditorController extends ChangeNotifier {
   Future<bool> hasCustomCSS(String cssName) async {
     final result = await _evalJs('RE.hasCustomCSS("$cssName");');
     return result == true;
+  }
+
+  // ==================== Custom JavaScript ====================
+
+  /// Evaluate custom JavaScript code in the editor.
+  ///
+  /// This allows advanced users to call custom JavaScript functions
+  /// that may be exposed by plugins or custom editor scripts.
+  ///
+  /// Example:
+  /// ```dart
+  /// await controller.evalJs('RE.insertMentionFromDart({user: {...}});');
+  /// ```
+  Future<void> evalJs(String code) async {
+    await _evalJs(code);
   }
 
   // ==================== Private Methods ====================

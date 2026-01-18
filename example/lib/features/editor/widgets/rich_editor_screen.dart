@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:example/features/editor/plugins/smart_blockquote.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_detection/keyboard_detection.dart';
@@ -18,12 +20,28 @@ class RichEditorScreen extends StatefulWidget {
 class _RichEditorScreenState extends State<RichEditorScreen> {
   late final mb.RichEditorController _controller;
   late final JsonEmojiSource _emojiSource;
-  late final mb.StaticMentionProvider _mentionProvider;
   late final KeyboardDetectionController _keyboardDetectionController;
   late final EditorUIState _uiState;
 
+  // User data for mentions (in real app, this would come from an API)
+  final List<mb.MentionUser> _mentionUsers = [
+    mb.MentionUser(
+      id: '1',
+      username: 'john_doe',
+      displayName: 'John Doe',
+      avatarUrl: 'https://i.pravatar.cc/150?u=1',
+    ),
+    mb.MentionUser(
+      id: '2',
+      username: 'jane_smith',
+      displayName: 'Jane Smith',
+      avatarUrl: 'https://i.pravatar.cc/150?u=2',
+    ),
+  ];
+
   // Visual state
   bool _isBottomSheetOpen = false;
+  bool _isMentionSheetOpen = false;
   String _currentHtml = '';
   // ignore: unused_field
   List<String> _activeStates = [];
@@ -57,23 +75,6 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
 
     _controller = mb.RichEditorController();
     _emojiSource = JsonEmojiSource(jsonPath: 'assets/emoji_voz.json');
-    _mentionProvider = mb.StaticMentionProvider(
-      users: [
-        mb.MentionUser(
-          id: '1',
-          username: 'john_doe',
-          displayName: 'John Doe',
-          avatarUrl: 'https://i.pravatar.cc/150?u=1',
-        ),
-        mb.MentionUser(
-          id: '2',
-          username: 'jane_smith',
-          displayName: 'Jane Smith',
-          avatarUrl: 'https://i.pravatar.cc/150?u=2',
-        ),
-        // ... add more if needed
-      ],
-    );
 
     _setupControllerCallbacks();
     // _loadInitialHtml();
@@ -84,25 +85,6 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
       if (emoji != null) _controller.insertEmoji(emoji);
     };
 
-    _controller.onMentionTrigger = (text) {
-      if (text != null && text.isNotEmpty && !_isBottomSheetOpen) {
-        _showMentionSuggestions();
-      }
-    };
-
-    _controller.onMentionHide = () {
-      if (_isBottomSheetOpen) {
-        _isBottomSheetOpen = false;
-        Navigator.of(context).pop();
-      }
-    };
-
-    _controller.onMentionSelected = (username) {
-      if (username != null) {
-        Navigator.of(context).pop();
-      }
-    };
-
     _controller.onDecorationChange = (states) {
       setState(() {
         _activeStates.clear();
@@ -111,14 +93,52 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
     };
   }
 
-  void _showMentionSuggestions() {
-    _isBottomSheetOpen = true;
-    MentionSheet.show(context, _mentionProvider.users).then((user) {
-      if (user != null) {
-        _controller.insertMention(mb.Mention.text(user: user));
+  // ==================== Mention Plugin ====================
+
+  /// Creates the mention plugin with callbacks
+  mb.MentionPlugin _createMentionPlugin() {
+    return mb.MentionPlugin(
+      onMentionTrigger: (query) => _showMentionPicker(query),
+      onMentionHide: () => _hideMentionPicker(),
+    );
+  }
+
+  /// Shows the mention picker bottom sheet
+  void _showMentionPicker(String query) {
+    if (_isMentionSheetOpen) return; // Prevent duplicate
+    _isMentionSheetOpen = true;
+    setState(() {});
+
+    // Filter users by query
+    final filteredUsers = _mentionUsers
+        .where((u) => u.username.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+
+    MentionSheet.show(context, filteredUsers).then((selectedUser) {
+      _isMentionSheetOpen = false;
+      setState(() {});
+      if (selectedUser != null) {
+        _insertMention(selectedUser);
       }
-      _isBottomSheetOpen = false;
     });
+  }
+
+  /// Hides the mention picker bottom sheet
+  void _hideMentionPicker() {
+    if (_isMentionSheetOpen) {
+      _isMentionSheetOpen = false;
+      setState(() {});
+      Navigator.of(context).pop();
+    }
+  }
+
+  /// Inserts a mention into the editor
+  void _insertMention(mb.MentionUser user) {
+    final mentionData = jsonEncode({
+      'user': user.toJson(),
+      'trigger': '@',
+    });
+    _controller.evalJs('RE.insertMentionFromDart($mentionData);');
   }
 
   void _onEmojiButtonTapped() {
@@ -143,7 +163,6 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
   void dispose() {
     _controller.dispose();
     _emojiSource.dispose();
-    _mentionProvider.dispose();
     _uiState.dispose();
     super.dispose();
   }
@@ -190,7 +209,7 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
                           onTextChange: (html) {
                             _currentHtml = html;
                           },
-                          plugins: [smartBlockquote],
+                          plugins: [smartBlockquote, _createMentionPlugin()],
                         ),
                       ),
                       Positioned(
