@@ -9,14 +9,17 @@ import '../css/custom_css.dart';
 import '../models/summernote_callbacks.dart';
 import '../plugin/summernote_plugin.dart';
 
+@Deprecated("Use MBRichEditor instead")
+typedef RichEditor = MBRichEditor;
+
 ///
 /// A WebView-based rich text editor for Flutter.
 ///
 /// Example usage:
 /// ```dart
-/// final controller = RichEditorController();
+/// final controller = MBRichEditorController();
 ///
-/// RichEditor(
+/// MBRichEditor(
 ///   controller: controller,
 ///   height: 300,
 ///   placeholder: 'Start typing...',
@@ -24,9 +27,9 @@ import '../plugin/summernote_plugin.dart';
 /// )
 /// ```
 ///
-class RichEditor extends StatefulWidget {
+class MBRichEditor extends StatefulWidget {
   /// Controller for this editor
-  final RichEditorController controller;
+  final MBRichEditorController controller;
 
   /// Height of the editor
   final double? height;
@@ -140,7 +143,7 @@ class RichEditor extends StatefulWidget {
   /// ```
   final List<CustomCSS> customCSS;
 
-  const RichEditor({
+  const MBRichEditor({
     super.key,
     required this.controller,
     this.height,
@@ -163,10 +166,10 @@ class RichEditor extends StatefulWidget {
   });
 
   @override
-  State<RichEditor> createState() => _RichEditorState();
+  State<MBRichEditor> createState() => _MBRichEditorState();
 }
 
-class _RichEditorState extends State<RichEditor> {
+class _MBRichEditorState extends State<MBRichEditor> {
   late InAppWebViewController _webViewController;
   List<CustomCSS> _pendingEditorCSS = [];
 
@@ -258,7 +261,7 @@ class _RichEditorState extends State<RichEditor> {
   }
 
   @override
-  void didUpdateWidget(RichEditor oldWidget) {
+  void didUpdateWidget(MBRichEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
       _setupController();
@@ -491,8 +494,12 @@ class _RichEditorState extends State<RichEditor> {
   ///
   /// Global CSS is loaded before editor init, editor-scoped CSS after.
   Future<void> _initializeCustomCSS(InAppWebViewController controller) async {
-    final globalCSS = widget.customCSS.where((css) => css.scope == CSSScope.global).toList();
-    final editorCSS = widget.customCSS.where((css) => css.scope == CSSScope.editor).toList();
+    final globalCSS = widget.customCSS
+        .where((css) => css.scope == CSSScope.global)
+        .toList();
+    final editorCSS = widget.customCSS
+        .where((css) => css.scope == CSSScope.editor)
+        .toList();
 
     // Load global CSS first (before editor initialization)
     for (final css in globalCSS) {
@@ -514,17 +521,20 @@ class _RichEditorState extends State<RichEditor> {
       if (css.cssContent != null) {
         final escapedCss = _escapeJavaScript(css.cssContent!);
         await controller.evaluateJavascript(
-          source: 'RE.injectCustomCSS("${css.cssName}", `$escapedCss`, {scope: "$scopeStr", priority: ${css.priority}});',
+          source:
+              'RE.injectCustomCSS("${css.cssName}", `$escapedCss`, {scope: "$scopeStr", priority: ${css.priority}});',
         );
       } else if (css.assetPath != null) {
         final assetContent = await rootBundle.loadString(css.assetPath!);
         final escapedCss = _escapeJavaScript(assetContent);
         await controller.evaluateJavascript(
-          source: 'RE.injectCustomCSSFromAsset("${css.cssName}", `$escapedCss`, {scope: "$scopeStr", priority: ${css.priority}});',
+          source:
+              'RE.injectCustomCSSFromAsset("${css.cssName}", `$escapedCss`, {scope: "$scopeStr", priority: ${css.priority}});',
         );
       } else if (css.cssUrl != null) {
         await controller.evaluateJavascript(
-          source: 'RE.injectCustomCSSFromUrl("${css.cssName}", "${css.cssUrl}", {scope: "$scopeStr", priority: ${css.priority}})',
+          source:
+              'RE.injectCustomCSSFromUrl("${css.cssName}", "${css.cssUrl}", {scope: "$scopeStr", priority: ${css.priority}})',
         );
       }
     } catch (e) {

@@ -6,11 +6,14 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import '../css/custom_css.dart';
 import '../emoji/models/emoji.dart';
 
+@Deprecated("Use MBRichEditorController instead")
+typedef RichEditorController = MBRichEditorController;
+
 ///
-/// Controller for the RichEditor widget.
+/// Controller for the MBRichEditor widget.
 /// Manages state, executes commands, and handles JavaScript communication.
 ///
-class RichEditorController extends ChangeNotifier {
+class MBRichEditorController extends ChangeNotifier {
   InAppWebViewController? _webViewController;
   bool _isReady = false;
   String _html = '';

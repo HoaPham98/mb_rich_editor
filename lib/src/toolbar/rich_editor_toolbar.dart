@@ -14,7 +14,7 @@ import 'package:mb_rich_editor/mb_rich_editor.dart';
 ///
 class MBRichEditorToolbar extends StatefulWidget {
   /// Controller for the rich editor
-  final RichEditorController controller;
+  final MBRichEditorController controller;
 
   /// Toolbar customization options
   final MBToolbarOptions options;

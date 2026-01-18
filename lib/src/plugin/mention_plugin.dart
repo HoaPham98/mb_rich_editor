@@ -13,7 +13,7 @@ import 'summernote_plugin.dart';
 ///
 /// Example usage:
 /// ```dart
-/// RichEditor(
+/// MBRichEditor(
 ///   plugins: [
 ///     MentionPlugin(
 ///       onMentionTrigger: (query) => _showMentionPicker(query),
@@ -267,14 +267,11 @@ RE.insertMentionFromDart = function(mentionData) {
   /// MentionPlugin.insertMention(_controller, selectedUser);
   /// ```
   static Future<void> insertMention(
-    RichEditorController controller,
+    MBRichEditorController controller,
     MentionUser user, {
     String trigger = '@',
   }) async {
-    final mentionData = jsonEncode({
-      'user': user.toJson(),
-      'trigger': trigger,
-    });
+    final mentionData = jsonEncode({'user': user.toJson(), 'trigger': trigger});
     await controller.evalJs('RE.insertMentionFromDart($mentionData);');
   }
 }

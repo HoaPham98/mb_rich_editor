@@ -1,7 +1,7 @@
 /// Built-in Summernote plugins for mb_rich_editor.
 ///
 /// This library contains ready-to-use Summernote plugins that can be
-/// directly used with the `RichEditor` widget.
+/// directly used with the `MBRichEditor` widget.
 library;
 
 import '../summernote_plugin.dart';
@@ -18,7 +18,7 @@ import '../summernote_plugin.dart';
 ///
 /// **Usage:**
 /// ```dart
-/// RichEditor(
+/// MBRichEditor(
 ///   controller: controller,
 ///   plugins: [
 ///     SmartBlockquotePlugin(),
@@ -116,7 +116,8 @@ class SmartBlockquotePlugin extends SummernotePlugin {
   /// This plugin automatically handles Enter key behavior inside blockquotes
   /// - Press Enter on empty line → exit blockquote
   /// - Press Enter on non-empty line → create new line inside
-  const SmartBlockquotePlugin() : super(
+  const SmartBlockquotePlugin()
+    : super(
         pluginName: 'smartBlockquoteExit',
         rawJavaScript: _javascriptCode,
         options: const {},

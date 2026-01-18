@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:keyboard_detection/keyboard_detection.dart';
-import 'package:mb_rich_editor/mb_rich_editor.dart' as mb;
+import 'package:mb_rich_editor/mb_rich_editor.dart';
 import '../../../emoji/sources/json_emoji_source.dart';
 import '../controllers/editor_ui_state.dart';
 import 'editor_bottom_panel.dart';
@@ -15,20 +15,20 @@ class RichEditorScreen extends StatefulWidget {
 }
 
 class _RichEditorScreenState extends State<RichEditorScreen> {
-  late final mb.RichEditorController _controller;
+  late final MBRichEditorController _controller;
   late final JsonEmojiSource _emojiSource;
   late final KeyboardDetectionController _keyboardDetectionController;
   late final EditorUIState _uiState;
 
   // User data for mentions (in real app, this would come from an API)
-  final List<mb.MentionUser> _mentionUsers = [
-    mb.MentionUser(
+  final List<MentionUser> _mentionUsers = [
+    MentionUser(
       id: '1',
       username: 'john_doe',
       displayName: 'John Doe',
       avatarUrl: 'https://i.pravatar.cc/150?u=1',
     ),
-    mb.MentionUser(
+    MentionUser(
       id: '2',
       username: 'jane_smith',
       displayName: 'Jane Smith',
@@ -69,7 +69,7 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
     );
     _keyboardDetectionController.ensureSizeLoaded;
 
-    _controller = mb.RichEditorController();
+    _controller = MBRichEditorController();
     _emojiSource = JsonEmojiSource(jsonPath: 'assets/emoji_voz.json');
 
     _setupControllerCallbacks();
@@ -92,8 +92,8 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
   // ==================== Mention Plugin ====================
 
   /// Creates the mention plugin with callbacks
-  mb.MentionPlugin _createMentionPlugin() {
-    return mb.MentionPlugin(
+  MentionPlugin _createMentionPlugin() {
+    return MentionPlugin(
       onMentionTrigger: (query) => _showMentionPicker(query),
       onMentionHide: () => _hideMentionPicker(),
     );
@@ -129,8 +129,8 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
   }
 
   /// Inserts a mention into the editor
-  void _insertMention(mb.MentionUser user) {
-    mb.MentionPlugin.insertMention(_controller, user);
+  void _insertMention(MentionUser user) {
+    MentionPlugin.insertMention(_controller, user);
   }
 
   void _onEmojiButtonTapped() {
@@ -191,7 +191,7 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
                     children: [
                       Positioned.fill(
                         bottom: _uiState.bottomAreaHeight + 56.0,
-                        child: mb.RichEditor(
+                        child: MBRichEditor(
                           controller: _controller,
                           placeholder: 'Start typing...',
                           customSummernoteOptions: {
@@ -201,7 +201,10 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
                           onTextChange: (html) {
                             _currentHtml = html;
                           },
-                          plugins: [mb.SmartBlockquotePlugin(), _createMentionPlugin()],
+                          plugins: [
+                            SmartBlockquotePlugin(),
+                            _createMentionPlugin(),
+                          ],
                         ),
                       ),
                       Positioned(
