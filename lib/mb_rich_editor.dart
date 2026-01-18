@@ -10,13 +10,6 @@ export 'src/emoji/models/emoji_source.dart';
 export 'src/emoji/config/emoji_picker_config.dart';
 export 'src/emoji/widgets/emoji_picker.dart';
 
-export 'src/mention/models/mention_user.dart';
-export 'src/mention/models/mention.dart';
-export 'src/mention/models/mention_provider.dart';
-export 'src/mention/config/mention_config.dart';
-export 'src/mention/widgets/mention_suggestions.dart';
-export 'src/mention/providers/static_mention_provider.dart';
-
 // Plugin exports
 export 'src/plugin/summernote_plugin.dart';
 
