@@ -38,6 +38,7 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
 
   // Visual state
   bool _isMentionSheetOpen = false;
+  MentionSheetController? _mentionSheetController;
   String _currentHtml = '';
   // ignore: unused_field
   final List<String> _activeStates = [];
@@ -101,17 +102,29 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
 
   /// Shows the mention picker bottom sheet
   void _showMentionPicker(String query) {
-    if (_isMentionSheetOpen) return; // Prevent duplicate
-    _isMentionSheetOpen = true;
-    setState(() {});
-
     // Filter users by query
     final filteredUsers = _mentionUsers
         .where((u) => u.username.toLowerCase().contains(query.toLowerCase()))
         .toList();
 
-    MentionSheet.show(context, filteredUsers).then((selectedUser) {
+    if (_isMentionSheetOpen) {
+      // Sheet is already open, just update the content
+      _mentionSheetController?.updateUsers(filteredUsers);
+      return;
+    }
+
+    // Open new sheet
+    _isMentionSheetOpen = true;
+    _mentionSheetController = MentionSheetController();
+    setState(() {});
+
+    MentionSheet.show(
+      context,
+      filteredUsers,
+      controller: _mentionSheetController,
+    ).then((selectedUser) {
       _isMentionSheetOpen = false;
+      _mentionSheetController = null;
       setState(() {});
       if (selectedUser != null) {
         _insertMention(selectedUser);
@@ -123,6 +136,7 @@ class _RichEditorScreenState extends State<RichEditorScreen> {
   void _hideMentionPicker() {
     if (_isMentionSheetOpen) {
       _isMentionSheetOpen = false;
+      _mentionSheetController = null;
       setState(() {});
       Navigator.of(context).pop();
     }
